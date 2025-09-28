@@ -11,7 +11,7 @@ import open_clip
 import seaborn as sns
 from PIL import Image
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-sys.path.append("D:/fzh/15-EEG/Neural-MCRL-main")
+sys.path.append("DanceSkyCode-Bratrix")
 os.environ["WANDB_API_KEY"] = "KEY"
 os.environ["WANDB_MODE"] = 'offline'
 from itertools import combinations
@@ -21,7 +21,7 @@ import numpy as np
 import torch.nn as nn
 import torchvision.transforms as transforms
 from tqdm import tqdm
-from EEGToVisual.datasets import EEGDataset
+from datasets import EEGDataset
 from matplotlib.colors import LinearSegmentedColormap
 from einops.layers.torch import Rearrange, Reduce
 from sklearn.metrics import confusion_matrix
@@ -342,30 +342,30 @@ class InterMCRAlignment(nn.Module):
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
-            nn.Dropout(0.5)  # 强制稀疏化# 输出稀疏编码长度 k
+            nn.Dropout(0.5)  
         )
 
         self.sparse_decoder = nn.Sequential(
             nn.Linear(128, 512),
             nn.ReLU(),
-            nn.Linear(512, 1024*1024),# 输出稀疏编码长度 k
-            nn.Dropout(0.5)  # 强制稀疏化
+            nn.Linear(512, 1024*1024),
+            nn.Dropout(0.5)  
         )
         self.image_uncertainty_head = nn.Sequential(
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 64),
             nn.ReLU(),
-            nn.Linear(64, 1),          # 输出一个不确定性标量
-            nn.Softplus()              # 保证输出为正值，避免负不确定性
+            nn.Linear(64, 1),     
+            nn.Softplus()      
         )
         self.text_uncertainty_head = nn.Sequential(
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 64),
             nn.ReLU(),
-            nn.Linear(64, 1),          # 输出一个不确定性标量
-            nn.Softplus()              # 保证输出为正值，避免负不确定性
+            nn.Linear(64, 1),         
+            nn.Softplus()       
         )
         self.fusion_img = LinearFusion()
         self.fusion_text = LinearFusion()
@@ -374,10 +374,7 @@ class InterMCRAlignment(nn.Module):
         self.prior_matrix_img = nn.Parameter(torch.zeros(1024, 1024))
 
     def visualize_prior_matrix(self, epoch):
-        """画出 prior_matrix_mri 权重图，取绝对值，红色到白色映射，颜色越深权重越大"""
         matrix = np.abs(self.prior_matrix_mri.detach().cpu().numpy())
-        
-        # 深红色映射到最大值，白色映射到最小值
         cmap = LinearSegmentedColormap.from_list("deep_red_white", ["white", "#8B0000"])
         
         plt.figure(figsize=(6, 6))
@@ -386,7 +383,7 @@ class InterMCRAlignment(nn.Module):
         plt.tight_layout()
         
         save_path = os.path.join(
-            'D:/fzh/15-EEG/Neural-MCRL-main/heatmap',
+            'DanceSkyCode-Bratrix/heatmap',
             f"prior_matrix_mri_epoch_{epoch}.png"
         )
         plt.savefig(save_path, dpi=300)
@@ -395,8 +392,6 @@ class InterMCRAlignment(nn.Module):
     def uncertainty(self, image_features, text_features):
         image_logits = self.image_uncertainty_head(image_features)  # [B, 4, K]
         text_logits  = self.text_uncertainty_head(text_features)    # [B, 4, K]
-
-        # 证据：exp(logit) 保证非负；+1 得到 Dirichlet 参数 α
         image_evidence = torch.exp(image_logits)
         text_evidence = torch.exp(text_logits)
 
@@ -410,15 +405,10 @@ class InterMCRAlignment(nn.Module):
 
         image_u = K / image_S  # [B, 4]
         text_u  = K / text_S
-        # 权重为 (1 - u): 可靠性高的视图权重大
         image_weights = 1.0 - image_u  # [B, 4]
         text_weights  = 1.0 - text_u   # [B, 4]
-
-        # 加权求和：先扩展维度便于广播
         image_weighted = (image_features * image_weights.unsqueeze(-1)).sum(dim=1)  # [B, 1024]
         text_weighted  = (text_features  * text_weights.unsqueeze(-1)).sum(dim=1)
-
-        # 归一化
         image_weights_sum = image_weights.sum(dim=1, keepdim=True) + 1e-8
         text_weights_sum  = text_weights.sum(dim=1, keepdim=True) + 1e-8
 
@@ -433,7 +423,7 @@ class InterMCRAlignment(nn.Module):
         weight_matrix = self.sparse_decoder(sparse_code_img)  
         if self.training:
             weight_matrix_image = weight_matrix.view(-1, 1024, 1024)  + self.prior_matrix_img # [B, 1024, 1024]
-            weight_matrix_image = torch.sigmoid(weight_matrix_image)  # 保持在 0~1，激活稀疏区域
+            weight_matrix_image = torch.sigmoid(weight_matrix_image) 
             
             image_text_feature = torch.bmm(image_proj.unsqueeze(2), text_proj.unsqueeze(1))  # outer product
             weighted_image_text = image_text_feature * weight_matrix_image
@@ -446,27 +436,9 @@ class InterMCRAlignment(nn.Module):
         B, D = eeg_features_o.size()
         image_proj, text_proj = self.uncertainty(image_features, text_features)
         eeg_features = self.proj_eeg(eeg_features_o) # torch.Size([256, 1024])
-        # 1. 计算 eeg_text 特征交互矩阵
-
-        # 2. 生成随机 mask，控制混合
         if self.training:
             eeg_text_feature = torch.bmm(eeg_features_o.unsqueeze(2), text_proj.unsqueeze(1))  # [B, 1024, 1024]
-            # lambda_ratio = min(0.8, 0.1 + 0.7 * int(epoch/40))  # 持续增长，最多 0.8
-            # mask = (torch.rand(B, D, device=eeg_features.device) < lambda_ratio).float()  # [B, 1024]
-
-            # if epoch % round_gap == 0:
-            #     # 模态1主导
-            #     mixed_token = image_proj * mask + eeg_features * (1 - mask)  # [B, 1024]
-            # elif epoch % round_gap == round_gap - 1:
-            #     # 模态2主导
-            #     mixed_token = eeg_features * mask + image_proj * (1 - mask)  # [B, 1024]
-            # else:
-            #     # 不混合，正常训练
-            #     mixed_token = eeg_features
-
-        # 3. 稀疏编码：从混合token生成稀疏权重矩阵
             sparse_code_eeg = self.sparse_encoder(eeg_features)           # [B, k]
-            # sparse_code_eeg = topk_sparsify(sparse_code_eeg)  
 
             weight_matrix = self.sparse_decoder(sparse_code_eeg)         # [B, 1024 * 1024]
             weight_matrix_eeg = weight_matrix.view(-1, 1024, 1024) + self.prior_matrix_mri   # [B, 1024, 1024]
@@ -475,15 +447,11 @@ class InterMCRAlignment(nn.Module):
             weighted_eeg_text = eeg_text_feature * weight_matrix_eeg     # [B, 1024, 1024]
             pooled_eeg_feature = weighted_eeg_text.mean(dim=2)       # [B, 1024]
             pooled_image_feature, sparse_code_img = self.matrix(image_proj, text_proj)
-            # image_proj = image_proj * weight_matrix_eeg.mean(dim=2)
 
             # eps = 1e-8
             p = F.softmax(sparse_code_eeg, dim=-1)
             q = F.softmax(sparse_code_img, dim=-1)
             kl_loss = F.kl_div(q.log(), p, reduction='batchmean') + F.kl_div(p.log(), q, reduction='batchmean')
-
-            # 2. 稀疏权重矩阵一致性损失（L2 或 Cosine）
-            # weight_consistency_loss = F.mse_loss(sparse_code_eeg.detach(), sparse_code_img.detach()) *0.3
             weight_consistency_loss = 0
             
             return pooled_eeg_feature, pooled_image_feature, kl_loss, weight_consistency_loss, image_proj, eeg_features_o
@@ -534,7 +502,6 @@ class ContrastiveLoss(nn.Module):
         return (loss_i + loss_t) / 2.0
 
 def load_pretrained_inter_mcr(model, ckpt_path):
-    """加载预训练参数，并且 key 以 inter_mcr. 开头"""
     checkpoint = torch.load(ckpt_path, map_location="cpu")
 
     # 取出 state_dict
@@ -545,13 +512,10 @@ def load_pretrained_inter_mcr(model, ckpt_path):
     else:
         state_dict = checkpoint
 
-    # 过滤出 inter_mcr. 开头的 key
     new_state_dict = {}
     for k, v in state_dict.items():
         if k.startswith("inter_mcr."):
-            new_state_dict[k[len("inter_mcr."):]] = v  # 去掉前缀以匹配 model
-
-    # 加载参数
+            new_state_dict[k[len("inter_mcr."):]] = v 
     missing, unexpected = model.load_state_dict(new_state_dict, strict=False)
     print("Missing keys:", missing)
     print("Unexpected keys:", unexpected)
@@ -669,8 +633,6 @@ def train_model(sub, eeg_model, dataloader, optimizer, scheduler, device, text_f
 
         optimizer.step()
         total_loss += loss.item()
-        
-         
         logits_img = logit_scale * eeg_features @ img_features.T
         logits_single = logits_img
         predicted = torch.argmax(logits_single, dim=1)  
@@ -678,11 +640,10 @@ def train_model(sub, eeg_model, dataloader, optimizer, scheduler, device, text_f
         batch_size = predicted.shape[0]
         total += batch_size
         correct += (predicted == labels).sum().item()
-        # eeg_model.inter_mcr.visualize_prior_matrix(epoch)
         del eeg_data, eeg_features, img_features, pooled_eeg_feature, pooled_image_feature
     if epoch == 20 :
         current_lr = optimizer.param_groups[0]['lr'] * 0.1
-        print(f"Epoch {epoch}, 当前学习率: {current_lr:.6f}")
+        print(f"Epoch {epoch}, lr: {current_lr:.6f}")
     average_loss = total_loss / (batch_idx+1)
     accuracy = correct / total
     return average_loss, accuracy, torch.cat(features_list, dim=0)
@@ -700,7 +661,7 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'D:/fzh/15-EEG/Neural-MCRL-main/results'
+    save_path = 'DanceSkyCode-Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -733,8 +694,6 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
                 possible_classes = list(all_labels - {label.item()})
                 selected_classes = random.sample(possible_classes, k-1) + [label.item()]
                 selected_img_features = img_features_all_de[selected_classes]
-                # selected_text_features = text_features_all[selected_classes]
-                
                 if k==200:
                     logits_img = logit_scale * eeg_features[idx] @ selected_img_features.T
                     logits_single = logits_img
@@ -795,7 +754,7 @@ def evaluate_model_feature(sub, eeg_model, dataloader, device, text_features_all
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'D:/fzh/15-EEG/Neural-MCRL-main/results'
+    save_path = 'DanceSkyCode-Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -809,8 +768,7 @@ def evaluate_model_feature(sub, eeg_model, dataloader, device, text_features_all
         for batch_idx, (eeg_data, labels, text, text_features, img, img_features) in enumerate(dataloader):
             if batch_idx%100 ==0:
                 print(batch_idx//100)
-            # 将原始批次数据拆分为单个样本，添加外层循环
-            eeg_data = eeg_data.to(device)  # 形状保持 [1, ...]
+            eeg_data = eeg_data.to(device)  
             batch_idx = eeg_data.shape[0]
             text_features = text_features.to(device).float()
             labels = labels.to(device)
@@ -826,38 +784,10 @@ def evaluate_model_feature(sub, eeg_model, dataloader, device, text_features_all
 
             all_eeg_features.append(eeg_features.detach().cpu().numpy())
             all_img_features.append(batch_image_features_ba.detach().cpu().numpy())
-        # img_features_all_de, text_features_all_de = eeg_model.inter_mcr.uncertainty(img_features_all, text_features_all)
-
-        # all_img_features_de_2 = []
-
-        # 按第一维度逐条推理
-        # for i in range(img_features_all_de.shape[0]):
-        #     img_feat = img_features_all_de[i].unsqueeze(0)   # [1, feature_dim]
-        #     text_feat = text_features_all_de[i].unsqueeze(0) # [1, feature_dim]
-            
-        #     img_feat_de_2, _ = eeg_model.inter_mcr.matrix(img_feat, text_feat)
-        #     all_img_features_de_2.append(img_feat_de_2.cpu())  # 先搬到 CPU 释放显存
-
-        # # 拼接回去
-        # img_features_all_de_2 = torch.cat(all_img_features_de_2, dim=0)  # [N, feature_dim]
-        # img_features_all_de = torch.cat((img_features_all_de.cpu(), img_features_all_de_2), dim=1)
-        # all_img_features_all_de.append(img_features_all_de.detach().cpu().numpy())
-        # del eeg_features, img_features_all_de_2, text_features_all_de
-        # torch.cuda.empty_cache()
-
-
-        # 拼接并保存
         all_eeg_features = np.vstack(all_eeg_features)  
         all_img_features = np.vstack(all_img_features)  
-        # all_img_features_all_de = np.vstack(all_img_features_all_de)
-
         np.save(os.path.join(save_path, f'eeg_features_{sub}_epoch{epoch}_{t}.npy'), all_eeg_features) 
         np.save(os.path.join(save_path, f'img_features_all_de_{sub}_epoch{epoch}_{t}.npy'), all_img_features)
-        # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        # all_eeg_features = torch.from_numpy(all_eeg_features).to(device)
-        # all_img_features_all_de = torch.from_numpy(all_img_features_all_de).to(device)
-
-    # return all_eeg_features, img_features_all_de
     return save_path, sub,epoch
 def main_train_loop(sub, current_time, eeg_model,pipe, train_dataloader, test_dataloader, optimizer, scheduler, device, text_features_train_all, text_features_test_all, img_features_train_all, img_features_test_all, img_source_train_all, img_source_test_all, config, logger=None):
     logger = wandb_logger(config) if logger else None
@@ -877,162 +807,8 @@ def main_train_loop(sub, current_time, eeg_model,pipe, train_dataloader, test_da
     best_epoch = 0
     best_path = None
     best_dir = None
-    # for epoch in range(config.epochs):
-        # Train the model
-    #     train_loss, train_accuracy, features_tensor = train_model(
-    #         sub, eeg_model, train_dataloader, optimizer, scheduler, device, 
-    #         text_features_train_all, img_features_train_all, config=config, epoch=epoch
-    #     )
-
-    #     # Evaluate the model
-    #     test_loss, test_accuracy, top5_acc = evaluate_model(
-    #         sub, eeg_model, test_dataloader, device, 
-    #         text_features_test_all, img_features_test_all, config=config, epoch=epoch, k=200
-    #     )
-    #     _, v2_acc, _ = evaluate_model(sub, eeg_model, test_dataloader, device, 
-    #                                 text_features_test_all, img_features_test_all, config=config, epoch=epoch, k=2)
-    #     _, v4_acc, _ = evaluate_model(sub, eeg_model, test_dataloader, device, 
-    #                                 text_features_test_all, img_features_test_all, config=config, epoch=epoch, k=4)
-    #     _, v10_acc, _ = evaluate_model(sub, eeg_model, test_dataloader, device, 
-    #                                 text_features_test_all, img_features_test_all, config=config, epoch=epoch, k=10)
-    #     _, v50_acc, v50_top5_acc = evaluate_model(sub, eeg_model, test_dataloader, device, 
-    #                                             text_features_test_all, img_features_test_all, config=config, epoch=epoch, k=50)
-    #     _, v100_acc, v100_top5_acc = evaluate_model(sub, eeg_model, test_dataloader, device, 
-    #                                                 text_features_test_all, img_features_test_all, config=config, epoch=epoch, k=100)
-
-    #     test_losses.append(test_loss)
-    #     test_accuracies.append(test_accuracy)
-    #     v2_accs.append(v2_acc)
-    #     v4_accs.append(v4_acc)
-    #     v10_accs.append(v10_acc)
-
-    #     # 保存 top-5 最佳模型
-    #     if top5_acc > best_top5 and epoch > 0:
-    #         best_epoch = epoch
-    #         best_top5 = top5_acc
-    #         if config.insubject:
-    #             save_dir = f"./models/contrast/{config.encoder_type}-eeg-{sub}-{current_time}"
-    #         else:
-    #             save_dir = f"./models/contrast/across/{config.encoder_type}-eeg-{sub}-{current_time}"
-            
-    #         # 确保目录存在
-    #         os.makedirs(save_dir, exist_ok=True)
-
-    #         # 删除旧模型（如果存在）
-    #         old_model_path = os.path.join(save_dir, "best_top5.pth")
-    #         if os.path.exists(old_model_path):
-    #             os.remove(old_model_path)
-
-    #         # 新模型路径，文件名里加 best_top5 精度
-    #         file_path = os.path.join(save_dir, f"best_top5-{best_top5:.4f}.pth")
-    #         torch.save(eeg_model.state_dict(), file_path)
-    #         best_path = file_path
-    #         best_dir = save_dir
-    #         print(f"New best top-5 model saved! Top-5 acc: {best_top5:.4f}, path: {file_path}")
-            
-    #     train_losses.append(train_loss)
-    #     train_accuracies.append(train_accuracy)
-        
-    #     # Append results for this epoch
-    #     epoch_results = {
-    #     "epoch": epoch + 1,
-    #     "test_loss": test_loss,
-    #     "test_accuracy": test_accuracy,
-    #     "v2_acc": v2_acc,
-    #     "v4_acc": v4_acc,
-    #     "v10_acc": v10_acc,
-    #     "top5_acc":top5_acc,
-    #     "v50_acc": v50_acc,
-    #     "v100_acc": v100_acc,
-    #     "v50_top5_acc":v50_top5_acc,
-    #     "v100_top5_acc": v100_top5_acc
-    #     }
-
-    #     results.append(epoch_results)
-         
-    #     if test_accuracy > best_accuracy:
-    #         best_accuracy = test_accuracy
-             
-    #         best_epoch_info = {
-    #             "epoch": epoch + 1,
-    #             "train_loss": train_loss,
-    #             "train_accuracy": train_accuracy,
-    #             "test_loss": test_loss,
-    #             "test_accuracy": test_accuracy,
-    #             "v2_acc":v2_acc,
-    #             "v4_acc":v4_acc,
-    #             "v10_acc":v10_acc
-    #         }
-    #     logger.log({
-    #         "Train Loss": train_loss,
-    #         "Train Accuracy": train_accuracy,
-    #         "Test Loss": test_loss,
-    #         "Test Accuracy": test_accuracy,
-    #         "v2 Accuracy": v2_acc,
-    #         "v4 Accuracy": v4_acc,
-    #         "v10 Accuracy": v10_acc,
-    #         "Epoch": epoch
-    #     })
-
-    #     print(f"Epoch {epoch + 1}/{config.epochs} - Train Loss: {train_loss:.4f}, Train Accuracy: {train_accuracy:.4f}, Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}, Top5 Accuracy: {top5_acc:.4f}")
-    #     print(f"Epoch {epoch + 1}/{config.epochs} - v2 Accuracy:{v2_acc} - v4 Accuracy:{v4_acc} - v10 Accuracy:{v10_acc} - v50 Accuracy:{v50_acc} - v100 Accuracy:{v100_acc}")
-  
-    
-    # # Create 5 subplots
-    # fig, axs = plt.subplots(3, 2, figsize=(10, 15))
-
-    # # Loss curve
-    # axs[0, 0].plot(train_losses, label='Train Loss')
-    # axs[0, 0].plot(test_losses, label='Test Loss')
-    # axs[0, 0].legend()
-    # axs[0, 0].set_title("Loss Curve")
-
-    # # Overall accuracy curve
-    # axs[0, 1].plot(train_accuracies, label='Train Accuracy')
-    # axs[0, 1].plot(test_accuracies, label='Test Accuracy')
-    # axs[0, 1].legend()
-    # axs[0, 1].set_title("Accuracy Curve")
-
-    # # The following are the three new plots you added, assuming you've already calculated the corresponding accuracies
-    # # 2-class accuracy plot
-    # axs[1, 0].plot(v2_accs, label='2-class Accuracy')
-    # axs[1, 0].legend()
-    # axs[1, 0].set_title("2-Class Accuracy Curve")
-
-    # # 4-class accuracy plot
-    # axs[1, 1].plot(v4_accs, label='4-class Accuracy')
-    # axs[1, 1].legend()
-    # axs[1, 1].set_title("4-Class Accuracy Curve")
-
-    # # 10-class accuracy plot
-    # axs[2, 0].plot(v10_accs, label='10-class Accuracy')
-    # axs[2, 0].legend()
-    # axs[2, 0].set_title("10-Class Accuracy Curve")
-
-    # # Construct the string information for annotation
-    # info_text = (f"Best Model Info (from Epoch {best_epoch_info['epoch']}):\n"
-    #             f"Train Loss: {best_epoch_info['train_loss']:.4f}\n"
-    #             f"Train Accuracy: {best_epoch_info['train_accuracy']:.4f}\n"
-    #             f"Test Loss: {best_epoch_info['test_loss']:.4f}\n"
-    #             f"Test Accuracy: {best_epoch_info['test_accuracy']:.4f}\n"
-    #             f"v2_acc:{best_epoch_info['v2_acc']:.4f}\n"
-    #             f"v4_acc:{best_epoch_info['v4_acc']:.4f}\n"
-    #             f"v10_acc:{best_epoch_info['v10_acc']:.4f}")
-
-    # axs[2, 1].axis('off')  
-    # axs[2, 1].text(0.5, 0.5, info_text, fontsize=10, ha='center', va='center', transform=axs[2, 1].transAxes)
-
-    # plt.tight_layout()
-
-    # # Add main title
-    # plt.suptitle('pos_img_text', fontsize=16, y=1.05)
-    # save_path =os.path.join(best_dir, "pos_img_text.png")
-    # plt.tight_layout()  # 自动调整子图间距
-    # plt.savefig(save_path, dpi=900, bbox_inches='tight') 
-    # state_dict = torch.load(best_path, map_location=device)
-    # eeg_model.load_state_dict(state_dict)
-    model_path = 'D:/fzh/15-EEG/Neural-MCRL-main/CLIP_checkpoint/open_clip_pytorch_model.bin'  
-    model_config_path = 'D:/fzh/15-EEG/Neural-MCRL-main/CLIP_checkpoint/open_clip_config.json' 
+    model_path = 'DanceSkyCode-Bratrix/CLIP_checkpoint/open_clip_pytorch_model.bin'  
+    model_config_path = 'DanceSkyCode-Bratrix/CLIP_checkpoint/open_clip_config.json' 
     model_type = 'ViT-H-14'
     vlmodel, preprocess_train, feature_extractor = open_clip.create_model_and_transforms(
         model_type, 
@@ -1046,24 +822,15 @@ def main_train_loop(sub, current_time, eeg_model,pipe, train_dataloader, test_da
     save_path, sub,epoch = evaluate_model_feature(sub, eeg_model, train_dataloader, device, 
                                 text_features_train_all, img_features_train_all, config=config, epoch=best_epoch, k=2, t ='train', vlmodel =vlmodel, preprocess_train = preprocess_train)
     all_eeg_features_test = np.load(os.path.join(save_path, f'eeg_features_{sub}_epoch{epoch}_test.npy'))
-    # 如需转换为PyTorch张量
     all_eeg_features_test = torch.tensor(all_eeg_features_test).to(device).float()
     all_eeg_features_test = all_eeg_features_test[:,:1024]
     all_eeg_features_train = np.load(os.path.join(save_path, f'eeg_features_{sub}_epoch{epoch}_train.npy'))
-    # 如需转换为PyTorch张量
     all_eeg_features_train = torch.tensor(all_eeg_features_train).to(device).float()
     all_eeg_features_train = all_eeg_features_train[:,:1024]
     img_features_all_de_train = np.load(os.path.join(save_path, f'img_features_all_de_{sub}_epoch{epoch}_train.npy'))
-    # 如需转换为PyTorch张量
     img_features_all_de_train = torch.tensor(img_features_all_de_train).to(device).float()
     img_feature_all_de_test  = np.load(os.path.join(save_path, f'img_features_all_de_{sub}_epoch{epoch}_test.npy'))
     img_feature_all_de_test = torch.tensor(img_feature_all_de_test).to(device).float()
-    # img_features_all_de_train = img_features_all_de_train.view(1654, 10, 1, 1024)
-    # img_features_all_de_train = img_features_all_de_train[:,:,:,:1024]
-    # # 在第3维（dim=2）重复4次，形状变为[1654, 10, 4, 1024]
-    # img_features_all_de_train = img_features_all_de_train.repeat(1, 1, 4, 1)
-    # # 展平为[-1, 1024]，总样本数为1654*10*4=66160
-    # img_features_all_de_train = img_features_all_de_train.view(-1, 1024)
     dataset = EmbeddingDataset(
     c_embeddings=all_eeg_features_train, h_embeddings=img_features_all_de_train[:,:1024], 
     # h_embeds_uncond=h_embeds_imgnet
@@ -1076,8 +843,6 @@ def main_train_loop(sub, current_time, eeg_model,pipe, train_dataloader, test_da
     # Create the directory if it doesn't exist
     os.makedirs(directory, exist_ok=True)
     torch.save(pipe.diffusion_prior.state_dict(), save_path)
-
-    # Assuming generator.generate returns a PIL Image
     generator = Generator4Embeds(num_inference_steps=4, device=device, path = save_path)
 
     directory = f"generated_imgs/{sub}"
@@ -1113,23 +878,12 @@ class DiffusionPriorUNet(nn.Module):
         self.embed_dim = embed_dim
         self.cond_dim = cond_dim
         self.hidden_dim = hidden_dim
-
-        # 1. time embedding
         self.time_proj = Timesteps(time_embed_dim, True, 0)
-
-        # 2. conditional embedding 
-        # to 3.2, 3,3
-
-        # 3. prior mlp
-
-        # 3.1 input
         self.input_layer = nn.Sequential(
             nn.Linear(embed_dim, hidden_dim[0]),
             nn.LayerNorm(hidden_dim[0]),
             act_fn(),
         )
-
-        # 3.2 hidden encoder
         self.num_layers = len(hidden_dim)
         self.encode_time_embedding = nn.ModuleList(
             [TimestepEmbedding(
@@ -1148,8 +902,6 @@ class DiffusionPriorUNet(nn.Module):
                     nn.Dropout(dropout),
                 ) for i in range(self.num_layers-1)]
         )
-
-        # 3.3 hidden decoder
         self.decode_time_embedding = nn.ModuleList(
             [TimestepEmbedding(
                 time_embed_dim,
@@ -1173,22 +925,8 @@ class DiffusionPriorUNet(nn.Module):
         
 
     def forward(self, x, t, c=None):
-        # x (batch_size, embed_dim)
-        # t (batch_size, )
-        # c (batch_size, cond_dim)
-
-        # 1. time embedding
         t = self.time_proj(t) # (batch_size, time_embed_dim)
-
-        # 2. conditional embedding 
-        # to 3.2, 3.3
-
-        # 3. prior mlp
-
-        # 3.1 input
         x = self.input_layer(x) 
-
-        # 3.2 hidden encoder
         hidden_activations = []
         for i in range(self.num_layers-1):
             hidden_activations.append(x)
@@ -1324,7 +1062,7 @@ class Pipe:
 def main():
     # Use argparse to parse the command-line arguments
     parser = argparse.ArgumentParser(description='EEG Transformer Training Script')
-    parser.add_argument('--data_path', type=str, default="C:/fzh/Preprocessed_data_250Hz", help='Path to the EEG dataset')
+    parser.add_argument('--data_path', type=str, default="DanceSkyCode-Bratrix/Preprocessed_data_250Hz", help='Path to the EEG dataset')
     parser.add_argument('--output_dir', type=str, default='./results', help='Directory to save output results')    
     parser.add_argument('--project', type=str, default="train_pos_img_text_rep", help='WandB project name')
     parser.add_argument('--entity', type=str, default="sustech_rethinkingbci", help='WandB entity name')
@@ -1354,10 +1092,10 @@ def main():
         diffusion_prior = DiffusionPriorUNet(cond_dim=1024, dropout=0.1)
         eeg_model.to(device)
         diffusion_prior.to(device)
-        path = r"D:\fzh\15-EEG\models\contrast\NeuralMCRL-eeg-sub-07-09-20_14-09\best_top5-0.8400.pth"
+        path = r"DanceSkyCode-Bratrix/models\contrast\NeuralMCRL-eeg-sub-07-09-20_14-09\best_top5-0.8400.pth"
         state_dict = torch.load(path, map_location=device)
         eeg_model.load_state_dict(state_dict)
-        path = r"D:\fzh\15-EEG\Neural-MCRL-main\diffusion_prior.pt"
+        path = r"DanceSkyCode-Bratrix/Neural-MCRL-main\diffusion_prior.pt"
         print(sum(p.numel() for p in diffusion_prior.parameters() if p.requires_grad))
         pipe = Pipe(diffusion_prior, device=device)
         pipe.diffusion_prior.load_state_dict(torch.load(path, map_location=device))

@@ -9,7 +9,7 @@ import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-sys.path.append("D:/fzh/15-EEG/Neural-MCRL-main")
+sys.path.append("DanceSkyCode-Bratrix")
 os.environ["WANDB_API_KEY"] = "KEY"
 os.environ["WANDB_MODE"] = 'offline'
 from sklearn.manifold import TSNE
@@ -18,7 +18,7 @@ import clip
 import torch.nn as nn
 import torchvision.transforms as transforms
 import tqdm
-from EEGToVisual.datasets import EEGDataset
+from datasets import EEGDataset
 from matplotlib.colors import LinearSegmentedColormap
 from einops.layers.torch import Rearrange, Reduce
 from sklearn.metrics import confusion_matrix
@@ -300,13 +300,13 @@ class MultiHeadAttention(nn.Module):
 class LinearFusion(nn.Module):
     def __init__(self, in_dim=1024):
         super().__init__()
-        self.attention = nn.Linear(in_dim, 1)  # 学习每个位置的权重
+        self.attention = nn.Linear(in_dim, 1) 
         
     def forward(self, x):
         # x: [200, 5, 1024]
-        weights = torch.softmax(self.attention(x).squeeze(2), dim=1)  # 权重：[200, 5]
-        weights = weights.unsqueeze(2)  # 扩展维度：[200, 5, 1]
-        x_fused = (x * weights).sum(dim=1)  # 加权求和：[200, 1024]
+        weights = torch.softmax(self.attention(x).squeeze(2), dim=1)  
+        weights = weights.unsqueeze(2)
+        x_fused = (x * weights).sum(dim=1) 
         return x_fused
 
 
@@ -314,17 +314,6 @@ class InterMCRAlignment(nn.Module):
     def __init__(self, d_model=256, num_heads=8, dropout=0.1):
         super().__init__()
         assert d_model % num_heads == 0, f"d_model ({d_model}) must be divisible by num_heads ({num_heads})"
-        
-        # self.text_eeg_attention = nn.MultiheadAttention(d_model, num_heads, dropout=dropout)
-        # self.norm1 = nn.LayerNorm(d_model)
-        
-        # self.text_image_attention = nn.MultiheadAttention(d_model, num_heads, dropout=dropout)
-        # self.norm2 = nn.LayerNorm(d_model)
-        
-        # self.final_alignment = nn.MultiheadAttention(d_model, num_heads, dropout=dropout)
-        # self.norm3 = nn.LayerNorm(d_model)
-        
-        # self.eeg_proj = nn.Linear(250, d_model)
         self.image_proj = nn.Linear(1024, d_model * 4 )
         self.text_proj = nn.Linear(1024, d_model * 4)
         
@@ -340,30 +329,30 @@ class InterMCRAlignment(nn.Module):
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 128),
-            nn.Dropout(0.5)  # 强制稀疏化# 输出稀疏编码长度 k
+            nn.Dropout(0.5)  
         )
 
         self.sparse_decoder = nn.Sequential(
             nn.Linear(128, 512),
             nn.ReLU(),
-            nn.Linear(512, 1024*1024),# 输出稀疏编码长度 k
-            nn.Dropout(0.5)  # 强制稀疏化
+            nn.Linear(512, 1024*1024),
+            nn.Dropout(0.5) 
         )
         self.image_uncertainty_head = nn.Sequential(
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 64),
             nn.ReLU(),
-            nn.Linear(64, 1),          # 输出一个不确定性标量
-            nn.Softplus()              # 保证输出为正值，避免负不确定性
+            nn.Linear(64, 1),      
+            nn.Softplus()       
         )
         self.text_uncertainty_head = nn.Sequential(
             nn.Linear(1024, 256),
             nn.ReLU(),
             nn.Linear(256, 64),
             nn.ReLU(),
-            nn.Linear(64, 1),          # 输出一个不确定性标量
-            nn.Softplus()              # 保证输出为正值，避免负不确定性
+            nn.Linear(64, 1),      
+            nn.Softplus()           
         )
         self.fusion_img = LinearFusion()
         self.fusion_text = LinearFusion()
@@ -372,10 +361,7 @@ class InterMCRAlignment(nn.Module):
         self.prior_matrix_img = nn.Parameter(torch.zeros(1024, 1024))
 
     def visualize_prior_matrix(self, epoch):
-        """画出 prior_matrix_mri 权重图，取绝对值，红色到白色映射，颜色越深权重越大"""
         matrix = np.abs(self.prior_matrix_mri.detach().cpu().numpy())
-        
-        # 深红色映射到最大值，白色映射到最小值
         cmap = LinearSegmentedColormap.from_list("deep_red_white", ["white", "#8B0000"])
         
         plt.figure(figsize=(6, 6))
@@ -384,7 +370,7 @@ class InterMCRAlignment(nn.Module):
         plt.tight_layout()
         
         save_path = os.path.join(
-            'D:/fzh/15-EEG/Neural-MCRL-main/heatmap',
+            'DanceSkyCode-Bratrix/heatmap',
             f"prior_matrix_mri_epoch_{epoch}.png"
         )
         plt.savefig(save_path, dpi=300)
@@ -393,8 +379,6 @@ class InterMCRAlignment(nn.Module):
     def uncertainty(self, image_features, text_features):
         image_logits = self.image_uncertainty_head(image_features)  # [B, 4, K]
         text_logits  = self.text_uncertainty_head(text_features)    # [B, 4, K]
-
-        # 证据：exp(logit) 保证非负；+1 得到 Dirichlet 参数 α
         image_evidence = torch.exp(image_logits)
         text_evidence = torch.exp(text_logits)
 
@@ -405,18 +389,12 @@ class InterMCRAlignment(nn.Module):
         K = image_alpha.shape[-1]
         image_S = image_alpha.sum(dim=-1)  # [B, 4]
         text_S  = text_alpha.sum(dim=-1)   # [B, 4]
-
         image_u = K / image_S  # [B, 4]
         text_u  = K / text_S
-        # 权重为 (1 - u): 可靠性高的视图权重大
         image_weights = 1.0 - image_u  # [B, 4]
         text_weights  = 1.0 - text_u   # [B, 4]
-
-        # 加权求和：先扩展维度便于广播
         image_weighted = (image_features * image_weights.unsqueeze(-1)).sum(dim=1)  # [B, 1024]
         text_weighted  = (text_features  * text_weights.unsqueeze(-1)).sum(dim=1)
-
-        # 归一化
         image_weights_sum = image_weights.sum(dim=1, keepdim=True) + 1e-8
         text_weights_sum  = text_weights.sum(dim=1, keepdim=True) + 1e-8
 
@@ -430,7 +408,7 @@ class InterMCRAlignment(nn.Module):
         sparse_code_img = self.sparse_encoder(image_proj)           # [B, k]
         weight_matrix = self.sparse_decoder(sparse_code_img)  
         weight_matrix_image = weight_matrix.view(-1, 1024, 1024)  + self.prior_matrix_img # [B, 1024, 1024]
-        weight_matrix_image = torch.sigmoid(weight_matrix_image)  # 保持在 0~1，激活稀疏区域
+        weight_matrix_image = torch.sigmoid(weight_matrix_image) 
         if self.training:
             image_text_feature = torch.bmm(image_proj.unsqueeze(2), text_proj.unsqueeze(1))  # outer product
             weighted_image_text = image_text_feature * weight_matrix_image
@@ -442,45 +420,19 @@ class InterMCRAlignment(nn.Module):
     def forward(self, eeg_features_o, image_features, text_features, epoch, round_gap=8):
         B, D = eeg_features_o.size()
         image_proj, text_proj = self.uncertainty(image_features, text_features)
-        eeg_features = self.proj_eeg(eeg_features_o) # torch.Size([256, 1024])
-        # 1. 计算 eeg_text 特征交互矩阵
-
-        # 2. 生成随机 mask，控制混合
+        eeg_features = self.proj_eeg(eeg_features_o) 
         if self.training:
             eeg_text_feature = torch.bmm(eeg_features_o.unsqueeze(2), text_proj.unsqueeze(1))  # [B, 1024, 1024]
-            # lambda_ratio = min(0.8, 0.1 + 0.7 * int(epoch/40))  # 持续增长，最多 0.8
-            # mask = (torch.rand(B, D, device=eeg_features.device) < lambda_ratio).float()  # [B, 1024]
-
-            # if epoch % round_gap == 0:
-            #     # 模态1主导
-            #     mixed_token = image_proj * mask + eeg_features * (1 - mask)  # [B, 1024]
-            # elif epoch % round_gap == round_gap - 1:
-            #     # 模态2主导
-            #     mixed_token = eeg_features * mask + image_proj * (1 - mask)  # [B, 1024]
-            # else:
-            #     # 不混合，正常训练
-            #     mixed_token = eeg_features
-
-        # 3. 稀疏编码：从混合token生成稀疏权重矩阵
             sparse_code_eeg = self.sparse_encoder(eeg_features)           # [B, k]
-            # sparse_code_eeg = topk_sparsify(sparse_code_eeg)  
-
             weight_matrix = self.sparse_decoder(sparse_code_eeg)         # [B, 1024 * 1024]
             weight_matrix_eeg = weight_matrix.view(-1, 1024, 1024) + self.prior_matrix_mri   # [B, 1024, 1024]
             weight_matrix_eeg = torch.sigmoid(weight_matrix_eeg)
-            # eeg_features = eeg_features * weight_matrix_eeg.mean(dim=2)
             weighted_eeg_text = eeg_text_feature * weight_matrix_eeg     # [B, 1024, 1024]
             pooled_eeg_feature = weighted_eeg_text.mean(dim=2)       # [B, 1024]
             pooled_image_feature, sparse_code_img = self.matrix(image_proj, text_proj)
-            # image_proj = image_proj * weight_matrix_eeg.mean(dim=2)
-
-            # eps = 1e-8
             p = F.softmax(sparse_code_eeg, dim=-1)
             q = F.softmax(sparse_code_img, dim=-1)
             kl_loss = F.kl_div(q.log(), p, reduction='batchmean') + F.kl_div(p.log(), q, reduction='batchmean')
-
-            # 2. 稀疏权重矩阵一致性损失（L2 或 Cosine）
-            # weight_consistency_loss = F.mse_loss(sparse_code_eeg.detach(), sparse_code_img.detach()) *0.3
             weight_consistency_loss = 0
             
             return pooled_eeg_feature, pooled_image_feature, kl_loss, weight_consistency_loss, image_proj, eeg_features_o
@@ -499,7 +451,6 @@ class InterMCRAlignment(nn.Module):
             weight_matrix_eeg = (image_proj * weight_matrix_eeg).mean(dim=2)
             image_proj = torch.cat((image_proj, weight_matrix_eeg),dim = 1)
             return image_proj, eeg_features_o
-
 class NoiseAugmentation(nn.Module):
     def __init__(self, sigma=0.01):
         super().__init__()
@@ -510,7 +461,6 @@ class NoiseAugmentation(nn.Module):
             noise = torch.randn_like(x) * self.sigma
             return x + noise
         return x
-
 class ContrastiveLoss(nn.Module):
     def __init__(self, temperature=0.07):
         super().__init__()
@@ -529,9 +479,7 @@ class ContrastiveLoss(nn.Module):
         loss_t = F.cross_entropy(logits.T, labels)
         
         return (loss_i + loss_t) / 2.0
-
 def load_pretrained_inter_mcr(model, ckpt_path):
-    """加载预训练参数，并且 key 以 inter_mcr. 开头"""
     checkpoint = torch.load(ckpt_path, map_location="cpu")
 
     # 取出 state_dict
@@ -541,14 +489,10 @@ def load_pretrained_inter_mcr(model, ckpt_path):
         state_dict = checkpoint["model_state_dict"]
     else:
         state_dict = checkpoint
-
-    # 过滤出 inter_mcr. 开头的 key
     new_state_dict = {}
     for k, v in state_dict.items():
         if k.startswith("inter_mcr."):
-            new_state_dict[k[len("inter_mcr."):]] = v  # 去掉前缀以匹配 model
-
-    # 加载参数
+            new_state_dict[k[len("inter_mcr."):]] = v  
     missing, unexpected = model.load_state_dict(new_state_dict, strict=False)
     print("Missing keys:", missing)
     print("Unexpected keys:", unexpected)
@@ -662,22 +606,11 @@ def train_model(sub, eeg_model, dataloader, optimizer, scheduler, device, text_f
         del eeg_data, eeg_features, img_features, pooled_eeg_feature, pooled_image_feature
     if epoch == 20 :
         current_lr = optimizer.param_groups[0]['lr'] * 0.1
-        print(f"Epoch {epoch}, 当前学习率: {current_lr:.6f}")
+        print(f"Epoch {epoch}, lr: {current_lr:.6f}")
     average_loss = total_loss / (batch_idx+1)
     accuracy = correct / total
     return average_loss, accuracy, torch.cat(features_list, dim=0)
-
-
-
 def compute_rsm(features, method="cosine"):
-    """
-    Compute Representational Similarity Matrix (RSM).
-    Args:
-        features: numpy array, shape (N, D)
-        method: 'cosine' or 'correlation'
-    Returns:
-        rsm: numpy array, shape (N, N)
-    """
     if method == "cosine":
         rsm = cosine_similarity(features)  # (N, N)
     elif method == "correlation":
@@ -685,10 +618,6 @@ def compute_rsm(features, method="cosine"):
     else:
         raise ValueError("method must be 'cosine' or 'correlation'")
     return rsm
-
-# ====================================================
-# 绘制 RSM
-# ====================================================
 def plot_rsm(rsm, title="Representational Similarity Matrix", save_path=None):
     plt.figure(figsize=(6, 5))
     plt.imshow(rsm, cmap="viridis", interpolation="nearest")
@@ -701,21 +630,8 @@ def plot_rsm(rsm, title="Representational Similarity Matrix", save_path=None):
         plt.savefig(save_path, dpi=300)
     plt.close()
 
-# ====================================================
-# 跨模态 RSM 相似度
-# ====================================================
 def compare_rsms(rsm1, rsm2, method="spearman"):
-    """
-    Compare two RSMs using correlation.
-    Args:
-        rsm1, rsm2: numpy arrays, shape (N, N)
-        method: 'spearman' or 'pearson'
-    Returns:
-        correlation coefficient, p-value
-    """
     assert rsm1.shape == rsm2.shape, "RSMs must have the same shape"
-    
-    # Flatten upper triangle (去掉对角线)
     idx = np.triu_indices_from(rsm1, k=1)
     vec1, vec2 = rsm1[idx], rsm2[idx]
     
@@ -734,13 +650,9 @@ def generate_and_compare_rsms(all_eeg_features, text_features_all, img_features_
     eeg_np = np.array(all_eeg_features)  # (N, D)
     text_np = text_features_all.cpu().numpy()
     img_np = img_features_all.cpu().numpy()
-
-    # 生成 RSM
     rsm_eeg = compute_rsm(eeg_np, method="cosine")
     rsm_text = compute_rsm(text_np, method="cosine")
     rsm_img = compute_rsm(img_np, method="cosine")
-
-    # 保存
     np.save(os.path.join(save_path, f"rsm_eeg_{sub}_epoch{epoch}.npy"), rsm_eeg)
     np.save(os.path.join(save_path, f"rsm_text_{sub}_epoch{epoch}.npy"), rsm_text)
     np.save(os.path.join(save_path, f"rsm_img_{sub}_epoch{epoch}.npy"), rsm_img)
@@ -751,8 +663,6 @@ def generate_and_compare_rsms(all_eeg_features, text_features_all, img_features_
              save_path=os.path.join(save_path, f"rsm_text_{sub}_epoch{epoch}.png"))
     plot_rsm(rsm_img, title=f"Image RSM (sub={sub}, epoch={epoch})",
              save_path=os.path.join(save_path, f"rsm_img_{sub}_epoch{epoch}.png"))
-
-    # 跨模态比较
     eeg_text_corr, eeg_text_p = compare_rsms(rsm_eeg, rsm_text, method="spearman")
     eeg_img_corr, eeg_img_p = compare_rsms(rsm_eeg, rsm_img, method="spearman")
     text_img_corr, text_img_p = compare_rsms(rsm_text, rsm_img, method="spearman")
@@ -778,7 +688,7 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'D:/fzh/15-EEG/Neural-MCRL-main/results'
+    save_path = 'DanceSkyCode-Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -802,43 +712,23 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
             img_features_all_de = torch.cat((img_features_all_de, img_features_all_de_2), dim=1)
             all_eeg_features.append(eeg_features.cpu().numpy())
             all_img_features.append(img_features.cpu().numpy())
-            # all_labels.append(labels.cpu().numpy())
-            # all_subject_ids.append(subject_ids.cpu().numpy())
             logit_scale = eeg_model.logit_scale
             loss = eeg_model.loss_func(eeg_features, img_features, logit_scale)
 
             
             total_loss += loss.item()
-            
-
-            # results_rsm = generate_and_compare_rsms(
-            #     all_eeg_features, text_features_all, img_features_all,
-            #     save_path, sub, epoch
-            # )
-            # print("RSM Cross-modal Similarities:", results_rsm)
-
-
-
 
             for idx, label in enumerate(labels):
                 possible_classes = list(all_labels - {label.item()})
                 selected_classes = random.sample(possible_classes, k-1) + [label.item()]
                 selected_img_features = img_features_all_de[selected_classes]
-                # selected_text_features = text_features_all[selected_classes]
-                
+
                 if k==200:
                     logits_img = logit_scale * eeg_features[idx] @ selected_img_features.T
                     logits_single = logits_img
                     predicted_label = selected_classes[torch.argmax(logits_single).item()]
-                    # 取 Top-10
                     topk_values, topk_indices = torch.topk(logits_single, k=10)
 
-                    # print("Top-10 predictions:")
-                    # for rank, (cls_idx, score) in enumerate(zip(topk_indices.tolist(), topk_values.tolist()), start=1):
-                    #     predicted_label = selected_classes[cls_idx]
-                    #     print(f"Rank {rank}: {predicted_label}, Score={score:.4f}")
-
-                    # 如果 Top-1 和真实标签一致就计数
                     if selected_classes[topk_indices[0].item()] == label.item():
                         correct += 1
                     _, top5_indices = torch.topk(logits_single, 5, largest =True)
@@ -872,9 +762,6 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
             del eeg_data, eeg_features, img_features
     all_eeg_features = np.concatenate(all_eeg_features, axis=0)
     all_img_features = np.concatenate(all_img_features, axis=0) 
-    # all_labels = np.concatenate(all_labels, axis=0) all_subject_ids = np.concatenate(all_subject_ids, axis=0)
-    # all_eeg_features = np.vstack(all_eeg_features)  
-    # np.save(os.path.join(save_path, f'eeg_features_{sub}_epoch{epoch}.npy'), all_eeg_features) 
     max_samples = 2000
     samples_per_subject = 200
     n_subjects = max_samples // samples_per_subject
@@ -889,13 +776,13 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     # ---------- EEG t-SNE ----------
     tsne_eeg = TSNE(n_components=2, perplexity=5, learning_rate=2000, random_state=40)
     eeg_result = tsne_eeg.fit_transform(eeg_sub)
-    colors = plt.cm.tab10(np.linspace(0, 1, n_subjects))  # 10 个颜色
+    colors = plt.cm.tab10(np.linspace(0, 1, n_subjects))  
     plt.figure(figsize=(10, 8))
     for i in range(n_subjects):
         idx = np.where(subj_sub == i)[0]
         plt.scatter(
             eeg_result[idx, 0], eeg_result[idx, 1],
-            color=colors[i],  # 每个 subject 固定一个颜色
+            color=colors[i], 
             label=f"Category {i}",
             alpha=0.7, s=20
         )
@@ -907,13 +794,13 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     # ---------- Image t-SNE ----------
     tsne_img = TSNE(n_components=2, perplexity=30, learning_rate=200, random_state=40)
     img_result = tsne_img.fit_transform(img_sub)
-    colors = plt.cm.tab10(np.linspace(0, 1, n_subjects))  # 10 个颜色
+    colors = plt.cm.tab10(np.linspace(0, 1, n_subjects)) 
     plt.figure(figsize=(10, 8))
     for i in range(n_subjects):
         idx = np.where(subj_sub == i)[0]
         plt.scatter(
             img_result[idx, 0], eeg_result[idx, 1],
-            color=colors[i],  # 每个 subject 固定一个颜色
+            color=colors[i],  
             label=f"Category {i}",
             alpha=0.7, s=20
         )
@@ -944,14 +831,14 @@ def main_train_loop(sub, current_time, eeg_model, train_dataloader, test_dataloa
     best_epoch_info = {}
     results = []  
     
-    best_top5 = 0  # 初始化记录最佳 top-5 准确率
+    best_top5 = 0  
 
     for epoch in range(config.epochs):
         # Train the model
-        # train_loss, train_accuracy, features_tensor = train_model(
-        #     sub, eeg_model, train_dataloader, optimizer, scheduler, device, 
-        #     text_features_train_all, img_features_train_all, config=config, epoch=epoch
-        # )
+        train_loss, train_accuracy, features_tensor = train_model(
+            sub, eeg_model, train_dataloader, optimizer, scheduler, device, 
+            text_features_train_all, img_features_train_all, config=config, epoch=epoch
+        )
 
         # Evaluate the model
         test_loss, test_accuracy, top5_acc = evaluate_model(
@@ -1102,7 +989,7 @@ import datetime
 def main():
     # Use argparse to parse the command-line arguments
     parser = argparse.ArgumentParser(description='EEG Transformer Training Script')
-    parser.add_argument('--data_path', type=str, default="C:/fzh/Preprocessed_data_250Hz", help='Path to the EEG dataset')
+    parser.add_argument('--data_path', type=str, default="DanceSkyCode-Bratrix/Preprocessed_data_250Hz", help='Path to the EEG dataset')
     parser.add_argument('--output_dir', type=str, default='./results', help='Directory to save output results')    
     parser.add_argument('--project', type=str, default="train_pos_img_text_rep", help='WandB project name')
     parser.add_argument('--entity', type=str, default="sustech_rethinkingbci", help='WandB entity name')
@@ -1130,14 +1017,14 @@ def main():
     for sub in subjects:
         eeg_model = globals()[args.encoder_type]()
         eeg_model.to(device)
-        path =r"D:\fzh\15-EEG\models\contrast\across\NeuralMCRL-eeg-sub-01-09-18_17-01\best_top5-0.7260.pth"
+        path =r"DanceSkyCode-Bratrix/models\contrast\across\NeuralMCRL-eeg-sub-01-09-18_17-01\best_top5-0.7260.pth"
         state_dict = torch.load(path, map_location=device)
         eeg_model.load_state_dict(state_dict)
         optimizer = AdamW(itertools.chain(eeg_model.parameters()), lr=args.lr)
         scheduler = torch.optim.lr_scheduler.StepLR(
             optimizer,
-            step_size=50,  # 每隔50轮调整一次
-            gamma=0.1      # 调整倍数：新学习率 = 原学习率 × 0.1
+            step_size=50, 
+            gamma=0.1  
         )
         if args.insubject:
             train_dataset = EEGDataset(args.data_path, subjects=[sub], train=True)

@@ -6,10 +6,10 @@ from PIL import Image
 import torch
 from transformers import AutoProcessor, Blip2ForConditionalGeneration, BitsAndBytesConfig
 
-# root_image_dir = "D:/fzh/15-EEG/Neural-MCRL-main/test_images" 
-root_image_dir = "C:/fzh/MEG/THINGSfMRI/THINGS-fMRI/images"
+# root_image_dir = "DanceSkyCode-Bratrix/test_images" 
+root_image_dir = "DanceSkyCode-Bratrix/MEG/THINGSfMRI/THINGS-fMRI/images"
 output_pkl = "fMRI_4_item_text_train_test_mix.pkl"  
-local_model_path = "D:/fzh/15-EEG/Neural-MCRL-main/BLIP_checkpoint"
+local_model_path = "DanceSkyCode-Bratrix/BLIP_checkpoint"
 
 prompts = [
     "this is a picture of",
