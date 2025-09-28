@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8"><style></style>
+  
+  <meta name="description" content="Unified Multimodal Chain-of-Thought Reward Model through Reinforcement Fine-Tuning">
+  <meta name="keywords" content="Reward Model, CoT, Reinforcement Learning">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnifiedReward-Think</title>
+
+
+  <link rel="shortcut icon" href="https://picx.zhimg.com/v2-cb40b1f8c3125f3cfb9a4538e1c0f2b7_l.jpg?source=32738c0c" type="image/x-icon">
+  <link href="./static/css" rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/bulma.min.css">
+  <link rel="stylesheet" href="./static/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/fontawesome.all.min.css">
+  <link rel="stylesheet" href="./static/academicons.min.css">
+  <link rel="stylesheet" href="./static/index.css">
+  <link rel="stylesheet" href="./static/leaderboard.css">
+
+  <script type="text/javascript" src="./static/sort-table.js" defer=""></script>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer="" src="./static/fontawesome.all.min.js"></script>
+  <script src="./static/bulma-carousel.min.js"></script>
+  <script src="./static/bulma-slider.min.js"></script>
+  <script src="./static/explorer-index.js"></script>
+  <script src="./static/question_card.js"></script>
+
+  <script src="./static/leaderboard_testmini.js"></script>  
+  <script src="./static/output_folders.js" defer=""></script>
+  <script src="./static/model_scores.js" defer=""></script>
+
+  <script src="./static/data_public.js" defer=""></script>
+
+  <style>
+      .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            margin-top: -20px;
+        }
+    .node {
+      fill: #f8f1e4;
+      stroke: #000;
+      stroke-width: 1;
+      rx: 10;
+      ry: 10;
+    }
+    .node text {
+      font-size: 14px;
+      text-anchor: middle;
+    }
+    .link {
+      fill: none;
+      stroke: #000;
+      stroke-width: 2;
+    }
+    .badge {
+      font-size: 12px;
+    }
+  </style>
+
+</head>
+<body>
+
+<nav class="navbar" role="navigation" aria-label="main navigation">
+  <div class="navbar-brand">
+    <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+      <span aria-hidden="true"></span>
+    </a>
+  </div>
+</nav>
+
+
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title is-bold" style="display: inline-block; margin-right: 0px;">
+            <span style="vertical-align: middle">Unified Multimodal Chain-of-Thought Reward Model through Reinforcement Fine-Tuning</span>
+            </h1>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://codegoat24.github.io/"><b>Yibin Wang</b></a><sup>*1,2</sup>,</span>
+              <span class="author-block">
+                <a href="https://scholar.google.com/citations?user=Lnr1FQEAAAAJ&hl=zh-CN"><b>Zhimin Li</b></a><sup>*4</sup>,</span>
+            <span class="author-block">
+              <a href="https://yuhangzang.github.io/"><b>Yuhang Zang</b></a><sup>3</sup><sup>†</sup>,</span>
+            <span class="author-block">
+               <a href="https://scholar.google.com/citations?hl=zh-CN&user=VXQV5xwAAAAJ"><b>Chunyu Wang</b></a><sup>4</sup>,
+            </span>
+            <span class="author-block">
+              <b>Qinglin Lu</b><sup>4</sup>,
+            </span>
+            <br>
+            <span class="author-block">
+              <a href="https://cjinfdu.github.io/"><b>Cheng Jin</b></a><sup>1</sup><sup>†</sup>,</span>
+              <span class="author-block">
+                <a href="https://myownskyw7.github.io/"><b>Jiaqi Wang</b></a><sup>2,3</sup><sup>†</sup></span>
+            
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block" style="margin-right: 15px;"><sup>1</sup>Fudan University,</span> 
+            <span class="author-block" style="margin-right: 15px;"><sup>2</sup>Shanghai Innovation Institute,</span><br>
+            <span class="author-block" style="margin-right: 15px;"><sup>3</sup>Shanghai AI Lab,</span>
+            <span class="author-block" style="margin-right: 15px;"><sup>4</sup>Hunyuan, Tencent</span><br>
+            <span class="paper-block">Accetped by<b style="color:#f41c1c"> NeurIPS 2025</b></span>
+          </div>
+<!--           <span class=""><sup>*</sup>Equal Contribution</span>
+          <span class=""><sup>†</sup>Corresponding Authors</span> -->
+          
+        
+          <!-- ArXiv Link. -->
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="https://arxiv.org/pdf/2505.03318" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <!-- Code Link. -->
+              <span class="link-block">
+                <a href="https://github.com/CodeGoat24/UnifiedReward" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <!-- Dataset Link. -->
+              <span class="link-block">
+                <a href="https://huggingface.co/collections/CodeGoat24/unifiedreward-models-67c3008148c3a380d15ac63a" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <!-- <i class="far fa-images"></i> -->
+                      <p style="font-size:18px">🤗</p>
+                      <!-- 🔗 -->
+                  </span>
+                  <span>Checkpoints</span>
+                </a>
+              </span> 
+
+              <span class="link-block">
+                <a href="https://huggingface.co/collections/CodeGoat24/unifiedreward-training-data-67c300d4fd5eff00fa7f1ede" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <!-- <i class="far fa-images"></i> -->
+                      <p style="font-size:18px">🤗</p>
+                      <!-- 🔗 -->
+                  </span>
+                  <span>Dataset</span>
+                </a>
+              </span> 
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Begin Teaser -->
+<div>
+
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="content has-text-centered">
+        <img src="static/images/think/teaser.png" alt="data-overview" width="800" height="600">
+      </div>
+      <div class="hero-body">
+        <h2 class="subtitle has-text-justified">
+          <p class="has-text-centered"><b>Overview of Comparison Results.</b> <br>(a) Our method enables multi-dimensional long CoT reasoning to improve reward signal accuracy. (b) Extensive quantitative results demonstrate our superiority in both vision understanding and generation reward tasks.</p>
+        </h2>
+      </div>
+    </div>
+  </section>
+</div>
+<!-- End Teaser -->
+
+<section class="section">
+  <div class="container is-max-desktop" >
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+            <p>
+              Recent advances in multimodal Reward Models (RMs) have shown significant promise in delivering reward signals to align vision models with human preferences. However, current RMs are generally restricted to providing direct responses or engaging in shallow reasoning processes with limited depth, often leading to inaccurate reward signals. We posit that incorporating explicit long chains of thought (CoT) into the reward reasoning process can significantly strengthen their reliability and robustness. Furthermore, we believe that once RMs internalize CoT reasoning, their direct response accuracy can also be improved through implicit reasoning capabilities. To this end, this paper proposes <b>UnifiedReward-Think</b>, the first unified multimodal CoT-based reward model, capable of multi-dimensional, step-by-step long-chain reasoning for both visual understanding and generation reward tasks. Specifically, we adopt an exploration-driven reinforcement fine-tuning approach to elicit and incentivize the model's latent complex reasoning ability: (1) We first use a small amount of image generation preference data to distill the reasoning process of GPT-4o, which is then used for the model's cold start to learn the format and structure of CoT reasoning. (2) Subsequently, by leveraging the model's prior knowledge and generalization capabilities, we prepare large-scale unified multimodal preference data to elicit the model's reasoning process across various vision tasks. During this phase, correct reasoning outputs are retained for rejection sampling to refine the model (3) while incorrect predicted samples are finally used for Group Relative Policy Optimization (GRPO) based reinforcement fine-tuning, enabling the model to explore diverse reasoning paths and optimize for correct and robust solutions. Extensive experiments confirm that incorporating long CoT reasoning significantly enhances the accuracy of reward signals. Notably, after mastering CoT reasoning, the model exhibits implicit reasoning capabilities, allowing it to surpass existing baselines even without explicit reasoning traces.
+            </p>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+    <!--/ Abstract. -->
+
+
+<section class="section">
+  <div class="container is-max-desktop" >
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Method Overview</h2>
+
+
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm;">
+        <img src="./static/images/think/pipeline_think.png" alt="pipeline" >
+      </div>
+    </div>
+    
+    <div class="hero-body">
+      <h2 class="has-text-justified" style="margin-top: -1cm;">
+        <p class="">The training pipeline consists of three key stages:  <br>
+          (1) <b>Cold Start</b>: We first distill GPT-4o's reasoning process on a small amount of image generation preference data to initialize the model's CoT reasoning format;<br>
+          (2) <b>Rejection Sampling</b>: Then, we leverage the model's generalization capabilities on large-scale unified multimodal preference data to elicit its CoT reasoning process across various vision tasks, using correctly predicted samples for rejection sampling to refine the model;<br>
+          (3) <b>GRPO</b>: Finally, incorrectly predicted samples are utilized for GRPO-based reinforcement fine-tuning to further enhance the model's step-by-step reasoning capabilities.</p>
+      </h2>
+    </div>
+    
+  </div>
+  </div>
+
+
+
+</section>
+
+
+
+
+
+<section class="section">
+  <div class="container is-max-desktop" >
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Reward Model Quantitative Comparison</h2>
+
+
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm; max-width: 90%;">
+        <img src="./static/images/think/image_understanding_results.png" alt="pipeline" >
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm; max-width: 90%;">
+        <img src="./static/images/think/vision_generation_results.png" alt="pipeline" >
+      </div>
+    </div>
+    <div class="hero-body">
+      <h2 class="subtitle has-text-justified" style="margin-top: -1cm;">
+        
+      </h2>
+    </div>
+    
+  </div>
+  </div>
+
+</section>
+
+<section class="section">
+  <div class="container is-max-desktop" >
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Ablation Results</h2>
+
+
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm; max-width: 90%;">
+        <img src="./static/images/think/ablation_image_understanding_results.png" alt="pipeline" >
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm; max-width: 90%;">
+        <img src="./static/images/think/ablation_vision_generation_results.png" alt="pipeline" >
+      </div>
+    </div>
+    <div class="hero-body">
+      <h2 class="subtitle has-text-justified" style="margin-top: -1cm;">
+        
+      </h2>
+    </div>
+    
+  </div>
+  </div>
+
+</section>
+
+
+<section class="section">
+  <div class="container is-max-desktop" >
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Qualitative Cases</h2>
+
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm;">
+        <img src="./static/images/think/vision_generation_case.png" alt="pipeline" >
+      </div>
+    </div>
+    <div class="columns is-centered">
+      <div class="content has-text-centered" style="margin-top: 1cm;">
+        <img src="./static/images/think/vision_understanding_case.png" alt="pipeline" >
+      </div>
+    </div>
+    
+    <div class="hero-body">
+      <!-- <h2 class="subtitle has-text-justified" style="margin-top: -1cm;">
+        <p class="has-text-centered"><b>Visualization of Statistical Results.</b> <br> This figure presents the distribution of our constructed unified preference dataset, along with the pairwise and pointwise distributions for each task.</p>
+      </h2> -->
+    </div>
+    
+  </div>
+  </div>
+
+  <section class="section">
+    <div class="container is-max-desktop" >
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Prompt Templates</h2>
+  
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="content has-text-centered" style="margin-top: 1cm;">
+          <img src="./static/images/think/more_image_generation_case.png" alt="pipeline" >
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="content has-text-centered" style="margin-top: 1cm;">
+          <img src="./static/images/think/more_video_generation_case.png" alt="pipeline" >
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="content has-text-centered" style="margin-top: 1cm;">
+          <img src="./static/images/think/more_image_understanding_case.png" alt="pipeline" >
+        </div>
+      </div>
+      <div class="columns is-centered">
+        <div class="content has-text-centered" style="margin-top: 1cm;">
+          <img src="./static/images/think/more_video_understanding_case.png" alt="pipeline" >
+        </div>
+      </div>
+      
+      <div class="hero-body">
+        <!-- <h2 class="subtitle has-text-justified" style="margin-top: -1cm;">
+          <p class="has-text-centered"><b>Visualization of Statistical Results.</b> <br> This figure presents the distribution of our constructed unified preference dataset, along with the pairwise and pointwise distributions for each task.</p>
+        </h2> -->
+      </div>
+      
+    </div>
+    </div>
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>
+
+@article{unifiedreward-think,
+  title={Unified multimodal chain-of-thought reward model through reinforcement fine-tuning},
+  author={Wang, Yibin and Li, Zhimin and Zang, Yuhang and Wang, Chunyu and Lu, Qinglin and Jin, Cheng and Wang, Jiaqi},
+  journal={arXiv preprint arXiv:2505.03318},
+  year={2025}
+}
+
+    </code></pre>
+  </div>
+</section>
+
+</body></html>
