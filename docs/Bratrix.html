@@ -5,7 +5,7 @@
   <meta name="description" content="Unveiling Deep Semantic Uncertainty Perception for Language-Anchored Multi-modal Vision-Brain Alignment">
   <meta name="keywords" content="brain-vision alignment, multimodal signal, ">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>UnifiedReward-Think</title>
+  <title>DanceSkyCode-Bratrix</title>
 
 
   <link rel="shortcut icon" href="https://th.bing.com/th/id/ODL.0935e1a9966be0081df28fa6a466c91e?w=100&h=100&c=12&pcl=faf9f7&o=6&dpr=1.2&pid=AlgoBlockDebug" type="image/x-icon">
@@ -35,15 +35,15 @@
   <script src="./static/data_public.js" defer=""></script>
 
   <style>
-  #animated-bg {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -1; /* 放到页面内容后面 */
-  background: #ffffff; /* 默认背景色 */
-}
+      #animated-bg {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1; /* 放到页面内容后面 */
+        background: #f0f4f8; /* 浅灰蓝色背景，可换成你喜欢的浅色 */
+      }
       .center-container {
             display: flex;
             justify-content: center;
@@ -408,11 +408,14 @@ for(let i = 0; i < particleCount; i++) {
 }
 
 function animate() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // 用背景色填充整个画布，避免黑色出现
+    ctx.fillStyle = '#f0f4f8'; // 同样的浅灰蓝色
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
     for(let p of particles) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.fillStyle = 'rgba(50,50,50,0.5)'; // 深灰色粒子，更柔和
         ctx.fill();
         p.x += p.dx;
         p.y += p.dy;
@@ -429,5 +432,4 @@ window.addEventListener('resize', () => {
     canvas.height = window.innerHeight;
 });
 </script>
-
 </body></html>
