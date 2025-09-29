@@ -172,18 +172,26 @@
 <!-- Begin Teaser -->
 <div>
 
-  <section class="hero teaser">
-    <div class="container is-max-desktop">
-      <div class="content has-text-centered">
-        <img src="static/images/Performance.png" alt="data-overview" width="800" height="600">
-      </div>
-      <div class="hero-body">
-        <h2 class="subtitle has-text-justified">
-          <p class="has-text-centered"><b>Comprehensive qualitative performance of Bratrix.</b> <br>(a) Top-10 retrieval visualization of EEG signals. The top results remain consistently within the Top-3, while the other selected samples demonstrate strong semantic consistency. (b) Multimodal Semantics, uncertainty, Text-EEG matrix explainable visualization. (c). Comparison example performance with competitive methods. Bratrix shows the most relevant Top-5 images. (d). Module Ablation Performance in Bratrix. (e). Representation similarity matrix in EEG, MEG, and fMRI signals. Test images are divided into 6 categories. </p>
-        </h2>
-      </div>
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="content has-text-centered">
+      <img src="static/images/Performance.png" alt="data-overview">
     </div>
-  </section>
+    <div class="hero-body">
+      <h2 class="subtitle has-text-justified">
+        <p class="has-text-centered">
+          <b>Comprehensive qualitative performance of Bratrix.</b><br>
+          (a) Top-10 retrieval visualization of EEG signals.<br>
+          (b) Multimodal Semantics, uncertainty, Text-EEG matrix explainable visualization.<br>
+          (c) Comparison example performance with competitive methods. Bratrix shows the most relevant Top-5 images.<br>
+          (d) Module Ablation Performance in Bratrix.<br>
+          (e) Representation similarity matrix in EEG, MEG, and fMRI signals. Test images are divided into 6 categories.
+        </p>
+      </h2>
+    </div>
+  </div>
+</section>
+
 </div>
 <!-- End Teaser -->
 
@@ -224,8 +232,8 @@
     
     <div class="hero-body">
       <h2 class="has-text-justified" style="margin-top: -1cm;">
-        <p class="">Overall Framework of Bratrix. Bratrix comprises Vision semantic decoupling pipeline, a Brain encoder pipeline, a language semantic decoupling pipeline, and a language-anchored visual-brain alignment. <br>
-          There are totally four stages in this framework: single-modal per-training phase, multi-modal fine-tuning phase, inference phase, and downstream task phase. </p>
+        <p class="">🌟🌟🌟 Overall Framework of Bratrix. Bratrix comprises Vision semantic decoupling pipeline, a Brain encoder pipeline, a language semantic decoupling pipeline, and a language-anchored visual-brain alignment. <br>
+          🌟🌟🌟 There are totally four stages in this framework: single-modal per-training phase, multi-modal fine-tuning phase, inference phase, and downstream task phase. </p>
       </h2>
     </div>
     
@@ -342,9 +350,6 @@
     </div>
     
     <div class="hero-body">
-      <!-- <h2 class="subtitle has-text-justified" style="margin-top: -1cm;">
-        <p class="has-text-centered"><b>Visualization of Statistical Results.</b> <br> This figure presents the distribution of our constructed unified preference dataset, along with the pairwise and pointwise distributions for each task.</p>
-      </h2> -->
     </div>
     
   </div>
@@ -365,9 +370,6 @@
     </div>
     
     <div class="hero-body">
-      <!-- <h2 class="subtitle has-text-justified" style="margin-top: -1cm;">
-        <p class="has-text-centered"><b>Visualization of Statistical Results.</b> <br> This figure presents the distribution of our constructed unified preference dataset, along with the pairwise and pointwise distributions for each task.</p>
-      </h2> -->
     </div>
     
   </div>
@@ -408,19 +410,17 @@ for(let i = 0; i < particleCount; i++) {
 }
 
 function animate() {
-    // 用背景色填充整个画布，避免黑色出现
-    ctx.fillStyle = '#f0f4f8'; // 同样的浅灰蓝色
+
+    ctx.fillStyle = '#f0f4f8'; 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     for(let p of particles) {
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = 'rgba(50,50,50,0.5)'; // 深灰色粒子，更柔和
+        ctx.fillStyle = 'rgba(50,50,50,0.5)'; 
         ctx.fill();
         p.x += p.dx;
         p.y += p.dy;
-        
-        // 边界反弹
         if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
         if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
     }
