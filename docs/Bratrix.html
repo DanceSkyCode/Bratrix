@@ -35,6 +35,15 @@
   <script src="./static/data_public.js" defer=""></script>
 
   <style>
+  #animated-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* 放到页面内容后面 */
+  background: #0d0d0d; /* 默认背景色 */
+}
       .center-container {
             display: flex;
             justify-content: center;
@@ -65,7 +74,7 @@
 
 </head>
 <body>
-
+<canvas id="animated-bg"></canvas>
 <nav class="navbar" role="navigation" aria-label="main navigation">
   <div class="navbar-brand">
     <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
@@ -101,7 +110,7 @@
             <span class="author-block" style="margin-right: 15px;"><sup>1</sup>Shanghai Jiao Tong University,</span> 
             <span class="author-block" style="margin-right: 15px;"><sup>2</sup>Nanyang Technology University,</span><br>
             <span class="author-block" style="margin-right: 15px;"><sup>3</sup>Zhejiang University,</span>
-            <span class="paper-block">Under Review</b></span>
+            <span class="paper-block"><sup>†</sup>Corresponding Author, Under Review</b></span>
           </div>
 <!--           <span class=""><sup>*</sup>Equal Contribution</span>
           <span class=""><sup>†</sup>Corresponding Authors</span> -->
@@ -379,5 +388,46 @@
     </code></pre>
   </div>
 </section>
+<script>
+const canvas = document.getElementById('animated-bg');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+const particles = [];
+const particleCount = 80;
+
+for(let i = 0; i < particleCount; i++) {
+    particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 3 + 1,
+        dx: (Math.random() - 0.5) * 0.5,
+        dy: (Math.random() - 0.5) * 0.5
+    });
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for(let p of particles) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255,255,255,0.7)';
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        
+        // 边界反弹
+        if(p.x < 0 || p.x > canvas.width) p.dx *= -1;
+        if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
+    }
+    requestAnimationFrame(animate);
+}
+animate();
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
 
 </body></html>
