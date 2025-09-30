@@ -42,7 +42,7 @@ Overview of multimodal decoding paradigms.
 </div>
 </div>
 
-Overall architecture of BrainFLORA.
+Overall architecture of Bratrix.
 
 
 
@@ -66,42 +66,13 @@ conda activate Bratrix
 pip install -r requirements.txt
 ```
 <h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">🐰 Raw Datset and Preprocessed Dataset Download</h2>
-<!-- ## Prepare for Dataset -->
-To download the raw data, you can follow:
-<div style="display: flex; flex-wrap: wrap; gap: 16px;">
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>THINGS-EEG1</strong><br>
-    <a href="https://openneuro.org/datasets/ds003825/versions/1.1.0" style="text-decoration: none; background: #ed7d7aff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>THINGS-EEG2</strong><br>
-    <a href="https://osf.io/3jk45/" style="text-decoration: none; background: #ed7d7aff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>THINGS-MEG</strong><br>
-    <a href="https://openneuro.org/datasets/ds004212/versions/2.0.0" style="text-decoration: none; background: #ed7d7aff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>THINGS-fMRI</strong><br>
-    <a href="https://openneuro.org/datasets/ds004192/versions/1.0.7" style="text-decoration: none; background: #ed7d7aff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>THINGS-Images</strong><br>
-    <a href="https://osf.io/rdxy2" style="text-decoration: none; background: #ed7d7aff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>Preprocessed-EEG</strong><br>
-    <a href="https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/EEG_preprocessed_data" style="text-decoration: none; background: #7aed8fff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>Preprocessed-MEG</strong><br>
-    <a href="https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/MEG_preprocessed_data" style="text-decoration: none; background: #7aed8fff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-  <div style="border: 1px solid #ddd; border-radius: 8px; padding: 12px; width: 130px; text-align: center;">
-    <strong>Preprocessed-fMRI</strong><br>
-    <a href="https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data" style="text-decoration: none; background: #7aed8fff; color: white; padding: 6px 12px; border-radius: 4px;">Download</a>
-  </div>
-</div>
+
+| Dataset | Dataset | Dataset | Dataset |
+|---------|---------|---------|---------|
+| **THINGS-EEG1**<br>[Download](https://openneuro.org/datasets/ds003825/versions/1.1.0) | **THINGS-EEG2**<br>[Download](https://osf.io/3jk45/) | **THINGS-MEG**<br>[Download](https://openneuro.org/datasets/ds004212/versions/2.0.0) | **THINGS-fMRI**<br>[Download](https://openneuro.org/datasets/ds004192/versions/1.0.7) |
+| **THINGS-Images**<br>[Download](https://osf.io/rdxy2) | **Preprocessed-EEG**<br>[Download](https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/EEG_preprocessed_data) | **Preprocessed-MEG**<br>[Download](https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/MEG_preprocessed_data) | **Preprocessed-fMRI**<br>[Download](https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data) |
+
+
 
 
 <!-- We will release the processed data (such as THINGS-EEG1, THINGS-EEG2, THINGS-MEG, THINGS-fMRI) on [Huggingface], which can be directly used for training.
@@ -148,7 +119,7 @@ python Bratrix-eeg-image-generation.py --data_path your_preprocessed_EEG_data_pa
 
 We provide scripts for visual caption generation.
 ```
-# step 2: get caption from prior latent
+# get caption from prior latent
 inference_caption.ipynb
 ```
 
