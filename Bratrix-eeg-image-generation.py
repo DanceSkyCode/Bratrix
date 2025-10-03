@@ -94,7 +94,7 @@ class iTransformer(nn.Module):
         enc_out = enc_out[:, :63, :]      
         return enc_out
 
-class EnhancedNSAM(nn.Module):
+class Frequency_Enhancer(nn.Module):
     def __init__(self, num_channels: int = 63, seq_length: int = 250, sampling_rate: float = 250.0):
         super().__init__()
         self.num_channels = num_channels
@@ -501,7 +501,7 @@ class ContrastiveLoss(nn.Module):
         
         return (loss_i + loss_t) / 2.0
 
-def load_pretrained_inter_mcr(model, ckpt_path):
+def load_pretrained_bratrix(model, ckpt_path):
     checkpoint = torch.load(ckpt_path, map_location="cpu")
 
     # 取出 state_dict
@@ -514,8 +514,8 @@ def load_pretrained_inter_mcr(model, ckpt_path):
 
     new_state_dict = {}
     for k, v in state_dict.items():
-        if k.startswith("inter_mcr."):
-            new_state_dict[k[len("inter_mcr."):]] = v 
+        if k.startswith("bratrix."):
+            new_state_dict[k[len("bratrix."):]] = v 
     missing, unexpected = model.load_state_dict(new_state_dict, strict=False)
     print("Missing keys:", missing)
     print("Unexpected keys:", unexpected)
@@ -533,7 +533,7 @@ class NeuralMCRL(nn.Module):
             init_id=True
         )
         self.encoder = iTransformer(default_config)
-        self.nsam = EnhancedNSAM(
+        self.frenhancer = Frequency_Enhancer(
             num_channels=num_channels,
             seq_length=sequence_length,
             sampling_rate=250.0
@@ -544,7 +544,7 @@ class NeuralMCRL(nn.Module):
         
         self.feature_norm = nn.LayerNorm([num_channels, sequence_length])
         
-        self.inter_mcr = InterMCRAlignment(
+        self.bratrix = InterMCRAlignment(
             d_model=d_model,
             num_heads=8,
             dropout=default_config.dropout
@@ -557,17 +557,17 @@ class NeuralMCRL(nn.Module):
     def forward(self, x, subject_ids, text_features=None, img_features=None, epoch=None):
         x = self.subject_layer(x, subject_ids) # torch.Size([256, 63, 250]) torch.Size([256])
         x_trans = self.encoder(x, None, subject_ids) # torch.Size([256, 63, 250])
-        x_processed = self.nsam(x_trans) # torch.Size([256, 63, 250])
+        x_processed = self.frenhancer(x_trans) # torch.Size([256, 63, 250])
         x_normalized = self.feature_norm(x_processed)
         eeg_features = self.enc_eeg(x_normalized) # torch.Size([256, 1440])
         eeg_projected = self.proj_eeg(eeg_features) # torch.Size([256, 1024])
 
         
         if self.training:
-            x_aligned, pooled_image_feature, kl_loss, weight_consistency_loss, img_features, eeg_features = self.inter_mcr(eeg_projected, img_features, text_features, epoch)
+            x_aligned, pooled_image_feature, kl_loss, weight_consistency_loss, img_features, eeg_features = self.bratrix(eeg_projected, img_features, text_features, epoch)
             final_features = x_aligned + eeg_projected
         else:
-            img_features, eeg_features = self.inter_mcr(eeg_projected, img_features, text_features, epoch)
+            img_features, eeg_features = self.bratrix(eeg_projected, img_features, text_features, epoch)
         if self.training:
             final_features = self.noise_aug(final_features)
             return final_features, pooled_image_feature, img_features, eeg_features, kl_loss, weight_consistency_loss
@@ -679,8 +679,8 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
             subject_id = extract_id_from_string(sub)
             subject_ids = torch.full((batch_size,), subject_id, dtype=torch.long).to(device)       
             eeg_features, img_features = eeg_model(eeg_data, subject_ids, text_features, img_features, epoch)
-            img_features_all_de, text_features_all_de = eeg_model.inter_mcr.uncertainty(img_features_all, text_features_all)
-            img_features_all_de_2, _ = eeg_model.inter_mcr.matrix(img_features_all_de, text_features_all_de)
+            img_features_all_de, text_features_all_de = eeg_model.bratrix.uncertainty(img_features_all, text_features_all)
+            img_features_all_de_2, _ = eeg_model.bratrix.matrix(img_features_all_de, text_features_all_de)
             img_features_all_de = torch.cat((img_features_all_de, img_features_all_de_2), dim=1)
             all_eeg_features.append(eeg_features.cpu().numpy())
         
@@ -1076,6 +1076,8 @@ def main():
     parser.add_argument('--insubject', type=bool, default=True, help='In-subject mode or cross-subject mode')
     parser.add_argument('--encoder_type', type=str, default='NeuralMCRL', help='Encoder type') 
     parser.add_argument('--subjects', nargs='+', default=['sub-07'], help='List of subject IDs (default: sub-01 to sub-10)')   
+    parser.add_argument('--checkpoint_path', nargs='+', default=None, help='your per-trained aligned checkpoint')   
+    
     args = parser.parse_args()
     #'sub-01','sub-02','sub-03', 'sub-04','sub-05','sub-06', 'sub-07','sub-08','sub-09', 
       
@@ -1092,10 +1094,10 @@ def main():
         diffusion_prior = DiffusionPriorUNet(cond_dim=1024, dropout=0.1)
         eeg_model.to(device)
         diffusion_prior.to(device)
-        path = r"DanceSkyCode-Bratrix/models\contrast\NeuralMCRL-eeg-sub-07-09-20_14-09\best_top5-0.8400.pth"
+        path = args.checkpoint_path
         state_dict = torch.load(path, map_location=device)
         eeg_model.load_state_dict(state_dict)
-        path = r"DanceSkyCode-Bratrix/Neural-MCRL-main\diffusion_prior.pt"
+        path = r"DanceSkyCode-Bratrix/Bratrix/diffusion_prior.pt"
         print(sum(p.numel() for p in diffusion_prior.parameters() if p.requires_grad))
         pipe = Pipe(diffusion_prior, device=device)
         pipe.diffusion_prior.load_state_dict(torch.load(path, map_location=device))
