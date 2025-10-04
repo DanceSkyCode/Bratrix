@@ -15,9 +15,9 @@
     <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/EEG_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
     <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/MEG_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
     <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/EEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/MEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/fMRI_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
   </p>
 </p>
 
