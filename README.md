@@ -51,9 +51,9 @@ Overall architecture of Bratrix.
 <!-- ## News -->
 <h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">✨ Update</h2>
 
-* **2025/09/30** 💻💻💻 we realize training and evaluation code.
-* **2025/09/29** 🖼️🖼️🖼️ We realize all pre-processed dataset
-* **2025/09/28** 🖼️🖼️🖼️ we realize all raw dataset.
+* **2025/09/30** 💻💻💻 we release training and evaluation code.
+* **2025/09/29** 🖼️🖼️🖼️ We release all pre-processed dataset
+* **2025/09/28** 🖼️🖼️🖼️ we release all raw dataset.
 
 
 <!-- ## Environment setup -->
@@ -118,10 +118,11 @@ python Bratrix-eeg-image-generation.py --data_path your_preprocessed_EEG_data_pa
 ```
 #### 4.Visual Captioning
 
-We provide scripts for visual caption generation.
+We followed ATM-S scripts for visual caption generation downstream task.
 ```
 # get caption from prior latent
 inference_caption.ipynb
+python Bratrix-eeg-image-generation.py 
 ```
 
 
