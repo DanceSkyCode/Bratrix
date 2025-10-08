@@ -118,11 +118,12 @@ python Bratrix-eeg-image-generation.py --data_path your_preprocessed_EEG_data_pa
 ```
 #### 4.Visual Captioning
 
-We followed ATM-S scripts for visual caption generation downstream task.
+We followed MindEye and BrainFLORA scripts for visual caption generation downstream task.
 ```
 # get caption from prior latent
-inference_caption.ipynb
-python Bratrix-eeg-image-generation.py 
+python Bratrix-caption_feature_generation_stage_1.py --data_path your_preprocessed_EEG_data_path --gpu cuda:0  --insubject False --subjects ['sub-01']
+# fine-tuning and inference caption results
+python Bratrix-caption_generation_stage_2.py
 ```
 
 
@@ -156,6 +157,7 @@ We sincerely thank the following outstanding works and contributors:
 3. **EEG decoding and neural embedding works** — for inspiring dataset preprocessing and neural network design:  
    - [Decoding Natural Images from EEG for Object Recognition](https://arxiv.org/pdf/2308.13234.pdf), Yonghao Song, Bingchuan Liu, Xiang Li, Nanlin Shi, Yijun Wang, Xiaorong Gao.  
    - [BrainFLORA: Uncovering Brain Concept Representation via Multimodal Neural Embeddings](https://arxiv.org/pdf/2507.09747), Dongyang Li, Haoyang Qin, Mingyang Wu, Chen Wei, Quanying Liu.  
+   - [UMBRAE: Unified Multimodal Brain Decoding](https://arxiv.org/abs/2404.07202), Xia, Weihao and de Charette, Raoul and Oztireli, Cengiz and Xue, Jing-Hao.
 
 ---
 
