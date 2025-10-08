@@ -520,9 +520,9 @@ def load_pretrained_bratrix(model, ckpt_path):
     print("Missing keys:", missing)
     print("Unexpected keys:", unexpected)
     return model
-class NeuralMCRL(nn.Module):    
+class Bratrix(nn.Module):    
     def __init__(self, num_channels=63, sequence_length=250, num_subjects=10, num_features=64, num_latents=1024, num_blocks=1):
-        super(NeuralMCRL, self).__init__()
+        super(Bratrix, self).__init__()
         default_config = Config()
         d_model = 256
         
@@ -839,7 +839,7 @@ def main_train_loop(sub, current_time, eeg_model,pipe, train_dataloader, test_da
     dataloader = DataLoader(dataset, batch_size=1024, shuffle=True, num_workers=0)
     pipe.train(dataloader, num_epochs=1000, learning_rate=3e-3)
     directory = os.path.dirname(save_path)
-    save_path = f'{directory}/results/NeuralMCRL/{sub}/generation.pt'
+    save_path = f'{directory}/results/Bratrix/{sub}/generation.pt'
     # Create the directory if it doesn't exist
     os.makedirs(directory, exist_ok=True)
     torch.save(pipe.diffusion_prior.state_dict(), save_path)
@@ -1074,7 +1074,7 @@ def main():
     parser.add_argument('--gpu', type=str, default='cuda:0', help='GPU device to use')
     parser.add_argument('--device', type=str, choices=['cpu', 'gpu'], default='gpu', help='Device to run on (cpu or gpu)')    
     parser.add_argument('--insubject', type=bool, default=True, help='In-subject mode or cross-subject mode')
-    parser.add_argument('--encoder_type', type=str, default='NeuralMCRL', help='Encoder type') 
+    parser.add_argument('--encoder_type', type=str, default='Bratrix', help='Encoder type') 
     parser.add_argument('--subjects', nargs='+', default=['sub-07'], help='List of subject IDs (default: sub-01 to sub-10)')   
     parser.add_argument('--checkpoint_path', nargs='+', default=None, help='your per-trained aligned checkpoint')   
     
