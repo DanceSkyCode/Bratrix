@@ -11,7 +11,7 @@ import open_clip
 import seaborn as sns
 from PIL import Image
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-sys.path.append("DanceSkyCode-Bratrix")
+sys.path.append("Bratrix")
 os.environ["WANDB_API_KEY"] = "KEY"
 os.environ["WANDB_MODE"] = 'offline'
 from itertools import combinations
@@ -383,7 +383,7 @@ class InterMCRAlignment(nn.Module):
         plt.tight_layout()
         
         save_path = os.path.join(
-            'DanceSkyCode-Bratrix/heatmap',
+            'Bratrix/heatmap',
             f"prior_matrix_mri_epoch_{epoch}.png"
         )
         plt.savefig(save_path, dpi=300)
@@ -661,7 +661,7 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'DanceSkyCode-Bratrix/results'
+    save_path = 'Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -754,7 +754,7 @@ def evaluate_model_feature(sub, eeg_model, dataloader, device, text_features_all
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'DanceSkyCode-Bratrix/results'
+    save_path = 'Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -807,8 +807,8 @@ def main_train_loop(sub, current_time, eeg_model,pipe, train_dataloader, test_da
     best_epoch = 0
     best_path = None
     best_dir = None
-    model_path = 'DanceSkyCode-Bratrix/CLIP_checkpoint/open_clip_pytorch_model.bin'  
-    model_config_path = 'DanceSkyCode-Bratrix/CLIP_checkpoint/open_clip_config.json' 
+    model_path = 'Bratrix/CLIP_checkpoint/open_clip_pytorch_model.bin'  
+    model_config_path = 'Bratrix/CLIP_checkpoint/open_clip_config.json' 
     model_type = 'ViT-H-14'
     vlmodel, preprocess_train, feature_extractor = open_clip.create_model_and_transforms(
         model_type, 
@@ -1062,7 +1062,7 @@ class Pipe:
 def main():
     # Use argparse to parse the command-line arguments
     parser = argparse.ArgumentParser(description='EEG Transformer Training Script')
-    parser.add_argument('--data_path', type=str, default="DanceSkyCode-Bratrix/Preprocessed_data_250Hz", help='Path to the EEG dataset')
+    parser.add_argument('--data_path', type=str, default="Bratrix/Preprocessed_data_250Hz", help='Path to the EEG dataset')
     parser.add_argument('--output_dir', type=str, default='./results', help='Directory to save output results')    
     parser.add_argument('--project', type=str, default="train_pos_img_text_rep", help='WandB project name')
     parser.add_argument('--entity', type=str, default="sustech_rethinkingbci", help='WandB entity name')
@@ -1097,7 +1097,7 @@ def main():
         path = args.checkpoint_path
         state_dict = torch.load(path, map_location=device)
         eeg_model.load_state_dict(state_dict)
-        path = r"DanceSkyCode-Bratrix/Bratrix/diffusion_prior.pt"
+        path = r"Bratrix/Bratrix/diffusion_prior.pt"
         print(sum(p.numel() for p in diffusion_prior.parameters() if p.requires_grad))
         pipe = Pipe(diffusion_prior, device=device)
         pipe.diffusion_prior.load_state_dict(torch.load(path, map_location=device))

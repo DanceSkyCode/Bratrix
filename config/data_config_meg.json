@@ -1,9 +1,9 @@
 {
-    "data_path": "DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Preprocessed_data",
-    "img_directory_training": "DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/training_images",
-    "img_directory_testing": "DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/test_images",
-    "img_segment_training":"DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/prediction-train",
-    "img_segment_testing":"DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/prediction-test",
-    "img_depth_training":"DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/depth_image_train",
-    "img_depth_testing":"DanceSkyCode-Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/depth_image_test"
+    "data_path": "Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Preprocessed_data",
+    "img_directory_training": "Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/training_images",
+    "img_directory_testing": "Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/test_images",
+    "img_segment_training":"Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/prediction-train",
+    "img_segment_testing":"Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/prediction-test",
+    "img_depth_training":"Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/depth_image_train",
+    "img_depth_testing":"Bratrix/MEG/THINGSMEG/THINGS-MEG/things-meg/Image_set/depth_image_test"
 }

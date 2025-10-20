@@ -11,13 +11,13 @@
   <a href="#">
   <p align="center">
     <a href='https://arxiv.org/'><img src='http://img.shields.io/badge/Paper-arxiv.2599.07721-B31B1B.svg'></a>
-    <a href='https://danceskycode.github.io/Bratrix/Bratrix'> <img src='https://img.shields.io/badge/Project-Website-orange' alt='Project Page'></a>
-    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/EEG_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/MEG_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/EEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/MEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/fMRI_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://github.com/'> <img src='https://img.shields.io/badge/Project-Website-orange' alt='Project Page'></a>
+    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Bratrix_THINGS_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Bratrix_THINGS_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Bratrix_THINGS_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
   </p>
 </p>
 
@@ -50,7 +50,7 @@ Overall architecture of Bratrix.
 
 <!-- ## News -->
 <h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">✨ Update</h2>
-
+* **2025/10/07** 💻💻💻 we are ready to release EEG/MEG/fMRI model weight.
 * **2025/09/30** 💻💻💻 we release training and evaluation code.
 * **2025/09/29** 🖼️🖼️🖼️ We release all pre-processed dataset
 * **2025/09/28** 🖼️🖼️🖼️ we release all raw dataset.
@@ -71,7 +71,7 @@ pip install -r requirements.txt
 | Dataset | Dataset | Dataset | Dataset |
 |---------|---------|---------|---------|
 | **THINGS-EEG1**<br>[Download](https://openneuro.org/datasets/ds003825/versions/1.1.0) | **THINGS-EEG2**<br>[Download](https://osf.io/3jk45/) | **THINGS-MEG**<br>[Download](https://openneuro.org/datasets/ds004212/versions/2.0.0) | **THINGS-fMRI**<br>[Download](https://openneuro.org/datasets/ds004192/versions/1.0.7) |
-| **THINGS-Images**<br>[Download](https://osf.io/rdxy2) | **Preprocessed-EEG**<br>[Download](https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/EEG_preprocessed_data) | **Preprocessed-MEG**<br>[Download](https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/MEG_preprocessed_data) | **Preprocessed-fMRI**<br>[Download](https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data) |
+| **THINGS-Images**<br>[Download](https://osf.io/rdxy2) | **Preprocessed-EEG**<br>[Download](https://huggingface.co/) | **Preprocessed-MEG**<br>[Download](https://huggingface.co/) | **Preprocessed-fMRI**<br>[Download](https://huggingface.co/) |
 
 
 
@@ -126,42 +126,24 @@ python Bratrix-caption_feature_generation_stage_1.py --data_path your_preprocess
 python Bratrix-caption_generation_stage_2.py
 ```
 
-
-<h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">👍 Citations</h2>
-
-If you find our work useful, please consider citing:
-
-
-```
-@article{Bratrix,
-  title={Unveiling Deep Semantic Uncertainty Perception for Language-Anchored Multi-modal Vision-Brain Alignment},
-  author={Zehui Feng, Cuntai Guan, Ting Han},
-  journal={arXiv preprint arXiv:},
-  year={2025}
-}
-```
-
-
 <!-- ## Acknowledge -->
 <h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">😺Acknowledge</h2>
 
 We sincerely thank the following outstanding works and contributors:  
 
 
-1. **[THINGS-EEG2 dataset](https://www.sciencedirect.com/science/article/pii/S1053811922008758?via%3Dihub)** — *A large and rich EEG dataset for modeling human visual object recognition*.  
+1. **THINGS-EEG2 dataset** — *A large and rich EEG dataset for modeling human visual object recognition*.  
    Authors: Alessandro T. Gifford, Kshitij Dwivedi, Gemma Roig, Radoslaw M. Cichy.  
 
-2. **[THINGS-data](https://elifesciences.org/articles/82580.pdf)** — a multimodal dataset for investigating object representations in the human brain and behavior.  
+2. **THINGS-data** — a multimodal dataset for investigating object representations in the human brain and behavior.  
    Authors: Hebart, Martin N., Oliver Contier, Lina Teichmann, Adam H. Rockter, Charles Y. Zheng, Alexis Kidder, Anna Corriveau, Maryam Vaziri-Pashkam, and Chris I. Baker.  
 
 3. **EEG decoding and neural embedding works** — for inspiring dataset preprocessing and neural network design:  
-   - [Decoding Natural Images from EEG for Object Recognition](https://arxiv.org/pdf/2308.13234.pdf), Yonghao Song, Bingchuan Liu, Xiang Li, Nanlin Shi, Yijun Wang, Xiaorong Gao.  
-   - [BrainFLORA: Uncovering Brain Concept Representation via Multimodal Neural Embeddings](https://arxiv.org/pdf/2507.09747), Dongyang Li, Haoyang Qin, Mingyang Wu, Chen Wei, Quanying Liu.  
-   - [UMBRAE: Unified Multimodal Brain Decoding](https://arxiv.org/abs/2404.07202), Xia, Weihao and de Charette, Raoul and Oztireli, Cengiz and Xue, Jing-Hao.
+   - Decoding Natural Images from EEG for Object Recognition, Yonghao Song, Bingchuan Liu, Xiang Li, Nanlin Shi, Yijun Wang, Xiaorong Gao.  
+   - BrainFLORA: Uncovering Brain Concept Representation via Multimodal Neural Embeddings, Dongyang Li, Haoyang Qin, Mingyang Wu, Chen Wei, Quanying Liu.  
+   - UMBRAE: Unified Multimodal Brain Decoding, Xia, Weihao and de Charette, Raoul and Oztireli, Cengiz and Xue, Jing-Hao.
 
 ---
-
-📩 For questions or suggestions, please contact [**Zehui Feng**](https://github.com/DanceSkyCode).
 
 # 🏷️ License
 This repository is released under the MIT license. See [LICENSE](./LICENSE) for additional details.

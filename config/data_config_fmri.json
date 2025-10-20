@@ -1,6 +1,6 @@
 {
-    "data_path": "DanceSkyCode-Bratrix/MEG/THINGSfMRI/THINGS-fMRI/preprocessed_data",
-    "img_directory": "DanceSkyCode-Bratrix/MEG/THINGSfMRI/THINGS-fMRI/images",
-    "img_segment":"DanceSkyCode-Bratrix/MEG/THINGSfMRI/THINGS-fMRI/mask_prediction",
-    "img_depth":"DanceSkyCode-Bratrix/MEG/THINGSfMRI/THINGS-fMRI/depth_images"
+    "data_path": "Bratrix/MEG/THINGSfMRI/THINGS-fMRI/preprocessed_data",
+    "img_directory": "Bratrix/MEG/THINGSfMRI/THINGS-fMRI/images",
+    "img_segment":"Bratrix/MEG/THINGSfMRI/THINGS-fMRI/mask_prediction",
+    "img_depth":"Bratrix/MEG/THINGSfMRI/THINGS-fMRI/depth_images"
 }

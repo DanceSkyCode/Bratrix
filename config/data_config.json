@@ -1,10 +1,10 @@
 {
-    "data_path": "DanceSkyCode-Bratrix/Preprocessed_data_250Hz",
-    "img_directory_training": "DanceSkyCode-Bratrix/Bratrix/training_images",
-    "img_directory_testing": "DanceSkyCode-Bratrix/Bratrix/test_images",
-    "features_path":"DanceSkyCode-Bratrix/Bratrix/EEGToVisual/features",
-    "img_segment_training":"DanceSkyCode-Bratrix/Bratrix/segment_images/predictions-train",
-    "img_segment_testing":"DanceSkyCode-Bratrix/Bratrix/segment_images/predictions-test",
-    "img_depth_training":"DanceSkyCode-Bratrix/Bratrix/depth_images/depth_image_train",
-    "img_depth_testing":"DanceSkyCode-Bratrix/Bratrix/depth_images/depth_image_test"
+    "data_path": "Bratrix/Preprocessed_data_250Hz",
+    "img_directory_training": "Bratrix/Bratrix/training_images",
+    "img_directory_testing": "Bratrix/Bratrix/test_images",
+    "features_path":"Bratrix/Bratrix/EEGToVisual/features",
+    "img_segment_training":"Bratrix/Bratrix/segment_images/predictions-train",
+    "img_segment_testing":"Bratrix/Bratrix/segment_images/predictions-test",
+    "img_depth_training":"Bratrix/Bratrix/depth_images/depth_image_train",
+    "img_depth_testing":"Bratrix/Bratrix/depth_images/depth_image_test"
 }

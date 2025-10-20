@@ -54,7 +54,7 @@ class EEGDataset():
     """
     def __init__(self, data_path, exclude_subject=None, subjects=None, train=True, time_window=[0, 1.0], classes = None, pictures = None, val_size=None):
 
-        config_path = "DanceSkyCode-Bratrix/config/data_config.json"
+        config_path = "Bratrix/config/data_config.json"
         with open(config_path, "r") as config_file:
             config = json.load(config_file)
 
@@ -92,8 +92,8 @@ class EEGDataset():
         self.resnet_layer4.eval()
         if self.classes is None and self.pictures is None:
         
-            text_features_filename = os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_text_features_train.pt') if self.train else os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_text_features_test.pt') # 文本特征文件名
-            img_features_filename = os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_img_features_train.pt') if self.train else os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_img_features_test.pt') # 图像特征文件名  
+            text_features_filename = os.path.join(f'Bratrix', f'{model_type}_text_features_train.pt') if self.train else os.path.join(f'Bratrix', f'{model_type}_text_features_test.pt') # 文本特征文件名
+            img_features_filename = os.path.join(f'Bratrix', f'{model_type}_img_features_train.pt') if self.train else os.path.join(f'Bratrix', f'{model_type}_img_features_test.pt') # 图像特征文件名  
 
             if os.path.exists(text_features_filename):
                 self.text_features = torch.load(text_features_filename)['text_features']
@@ -119,9 +119,9 @@ class EEGDataset():
         images = []
  
         if self.train:
-            text_file_path = os.path.join('DanceSkyCode-Bratrix', '4_item_text_train.pkl')
+            text_file_path = os.path.join('Bratrix', '4_item_text_train.pkl')
         else:
-            text_file_path = os.path.join('DanceSkyCode-Bratrix', '4_item_text_test.pkl')
+            text_file_path = os.path.join('Bratrix', '4_item_text_test.pkl')
 
         if os.path.exists(text_file_path):
             with open(text_file_path, 'rb') as f:
@@ -469,7 +469,7 @@ class MEGDataset():
 
 
 
-        config_path = "DanceSkyCode-Bratrix/EEGToVisual/data_config_meg.json"
+        config_path = "Bratrix/EEGToVisual/data_config_meg.json"
         with open(config_path, "r") as config_file:
             config = json.load(config_file)
 
@@ -498,14 +498,14 @@ class MEGDataset():
 
         self.data, self.labels, self.text, self.img = self.load_data()
         self.resnet = models.resnet101(pretrained=False)
-        weight_path = r"DanceSkyCode-Bratrix/resnet101-63fe2227.pth"
+        weight_path = r"Bratrix/resnet101-63fe2227.pth"
         self.resnet.load_state_dict(torch.load(weight_path))
         self.resnet_layer4 = nn.Sequential(*list(self.resnet.children())[:8]).to(device) 
         self.resnet_layer4.eval()
         if self.classes is None and self.pictures is None:
         
-            text_features_filename = os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_text_meg_features_train.pt') if self.train else os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_text_meg_features_test.pt') # 文本特征文件名
-            img_features_filename = os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_img_meg_features_train.pt') if self.train else os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_img_meg_features_test.pt') # 图像特征文件名  
+            text_features_filename = os.path.join(f'Bratrix', f'{model_type}_text_meg_features_train.pt') if self.train else os.path.join(f'Bratrix', f'{model_type}_text_meg_features_test.pt') # 文本特征文件名
+            img_features_filename = os.path.join(f'Bratrix', f'{model_type}_img_meg_features_train.pt') if self.train else os.path.join(f'Bratrix', f'{model_type}_img_meg_features_test.pt') # 图像特征文件名  
 
             if os.path.exists(text_features_filename):
                 self.text_features = torch.load(text_features_filename)['text_features']
@@ -531,9 +531,9 @@ class MEGDataset():
         images = []
  
         if self.train:
-            text_file_path = 'DanceSkyCode-Bratrix/meg_4_item_text_train.pkl'
+            text_file_path = 'Bratrix/meg_4_item_text_train.pkl'
         else:
-            text_file_path = 'DanceSkyCode-Bratrix/meg_4_item_text_test.pkl'
+            text_file_path = 'Bratrix/meg_4_item_text_test.pkl'
 
         if os.path.exists(text_file_path):
             with open(text_file_path, 'rb') as f:
@@ -876,7 +876,7 @@ class fMRIDataset():
     subjects = ['sub-01', 'sub-02', 'sub-03']
     """
     def __init__(self, data_path, exclude_subject=None, subjects=None, train=True, time_window=[0, 1.0], classes = None, pictures = None, val_size=None):
-        config_path = "DanceSkyCode-Bratrix/EEGToVisual/data_config_fmri.json"
+        config_path = "Bratrix/EEGToVisual/data_config_fmri.json"
         with open(config_path, "r") as config_file:
             config = json.load(config_file)
 
@@ -907,14 +907,14 @@ class fMRIDataset():
         # self.data = self.extract_eeg(self.data, time_window)
         self.resnet = models.resnet101(pretrained=False)
         # 加载本地权重文件
-        weight_path = r"DanceSkyCode-Bratrix/resnet101-63fe2227.pth"
+        weight_path = r"Bratrix/resnet101-63fe2227.pth"
         self.resnet.load_state_dict(torch.load(weight_path))
         self.resnet_layer4 = nn.Sequential(*list(self.resnet.children())[:8]).to(device)  # 到layer4
         self.resnet_layer4.eval()
         if self.classes is None and self.pictures is None:
         
-            text_features_filename = os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_text_fmri_features_train.pt') if self.train else os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_text_fmri_features_test.pt') # 文本特征文件名
-            img_features_filename = os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_img_fmri_features_train.pt') if self.train else os.path.join(f'DanceSkyCode-Bratrix', f'{model_type}_img_fmri_features_test.pt') # 图像特征文件名  
+            text_features_filename = os.path.join(f'Bratrix', f'{model_type}_text_fmri_features_train.pt') if self.train else os.path.join(f'Bratrix', f'{model_type}_text_fmri_features_test.pt') # 文本特征文件名
+            img_features_filename = os.path.join(f'Bratrix', f'{model_type}_img_fmri_features_train.pt') if self.train else os.path.join(f'Bratrix', f'{model_type}_img_fmri_features_test.pt') # 图像特征文件名  
 
             if os.path.exists(text_features_filename):
                 self.text_features = torch.load(text_features_filename)['text_features']
@@ -939,7 +939,7 @@ class fMRIDataset():
         texts = []
         images = []
  
-        text_file_path = 'DanceSkyCode-Bratrix/fMRI_4_item_text_train_test_mix.pkl'
+        text_file_path = 'Bratrix/fMRI_4_item_text_train_test_mix.pkl'
 
         if os.path.exists(text_file_path):
             with open(text_file_path, 'rb') as f:
@@ -949,9 +949,9 @@ class fMRIDataset():
 
 
         subject_csv_map = {
-            "sub-01": r"DanceSkyCode-Bratrix/sub-01_StimulusMetadata.csv",
-            "sub-02": r"DanceSkyCode-Bratrix/sub-02_StimulusMetadata.csv",
-            "sub-03": r"DanceSkyCode-Bratrix/sub-03_StimulusMetadata.csv"
+            "sub-01": r"Bratrix/sub-01_StimulusMetadata.csv",
+            "sub-02": r"Bratrix/sub-02_StimulusMetadata.csv",
+            "sub-03": r"Bratrix/sub-03_StimulusMetadata.csv"
         }
 
         subject_file_order = {}

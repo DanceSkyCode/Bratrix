@@ -9,7 +9,7 @@ import sys
 import matplotlib.pyplot as plt
 import seaborn as sns
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-sys.path.append("DanceSkyCode-Bratrix")
+sys.path.append("Bratrix")
 os.environ["WANDB_API_KEY"] = "KEY"
 os.environ["WANDB_MODE"] = 'offline'
 from sklearn.manifold import TSNE
@@ -370,7 +370,7 @@ class InterMCRAlignment(nn.Module):
         plt.tight_layout()
         
         save_path = os.path.join(
-            'DanceSkyCode-Bratrix/heatmap',
+            'Bratrix/heatmap',
             f"prior_matrix_mri_epoch_{epoch}.png"
         )
         plt.savefig(save_path, dpi=300)
@@ -688,7 +688,7 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'DanceSkyCode-Bratrix/results'
+    save_path = 'Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -989,7 +989,7 @@ import datetime
 def main():
     # Use argparse to parse the command-line arguments
     parser = argparse.ArgumentParser(description='EEG Transformer Training Script')
-    parser.add_argument('--data_path', type=str, default="DanceSkyCode-Bratrix/Preprocessed_data_250Hz", help='Path to the EEG dataset')
+    parser.add_argument('--data_path', type=str, default="Bratrix/Preprocessed_data_250Hz", help='Path to the EEG dataset')
     parser.add_argument('--output_dir', type=str, default='./results', help='Directory to save output results')    
     parser.add_argument('--project', type=str, default="train_pos_img_text_rep", help='WandB project name')
     parser.add_argument('--entity', type=str, default="sustech_rethinkingbci", help='WandB entity name')
@@ -1017,7 +1017,7 @@ def main():
     for sub in subjects:
         eeg_model = globals()[args.encoder_type]()
         eeg_model.to(device)
-        path =r"DanceSkyCode-Bratrix/models\contrast\across\Bratrix-eeg-sub-01-09-18_17-01\best_top5-.pth"
+        path =r"Bratrix/models\contrast\across\Bratrix-eeg-sub-01-09-18_17-01\best_top5-.pth"
         state_dict = torch.load(path, map_location=device)
         eeg_model.load_state_dict(state_dict)
         optimizer = AdamW(itertools.chain(eeg_model.parameters()), lr=args.lr)

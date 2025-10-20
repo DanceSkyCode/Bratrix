@@ -7,7 +7,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader
 import sys
 os.environ["CUDA_VISIBLE_DEVICES"] = "1"
-sys.path.append("DanceSkyCode-Bratrix")
+sys.path.append("Bratrix")
 os.environ["WANDB_API_KEY"] = "KEY"
 os.environ["WANDB_MODE"] = 'offline'
 from itertools import combinations
@@ -610,7 +610,7 @@ class Bratrix(nn.Module):
             num_heads=8,
             dropout=default_config.dropout
         )
-        path = r"DanceSkyCode-Bratrix/best_top5.pth"
+        path = r"Bratrix/best_top5.pth"
         self.bratrix = load_pretrained_bratrix(self.bratrix, path)
         self.noise_aug = NoiseAugmentation(sigma=0.01)
         self.bratrix1 = InterMCRAlignment2(
@@ -722,7 +722,7 @@ def evaluate_model(sub, eeg_model, dataloader, device, text_features_all, img_fe
     all_labels = set(range(text_features_all.size(0)))
     top5_acc = 0
 
-    save_path = 'DanceSkyCode-Bratrix/results'
+    save_path = 'Bratrix/results'
     if not os.path.exists(save_path):
         os.makedirs(save_path)
 
@@ -974,7 +974,7 @@ import datetime
 def main():
     # Use argparse to parse the command-line arguments
     parser = argparse.ArgumentParser(description='EEG Transformer Training Script')
-    parser.add_argument('--data_path', type=str, default="DanceSkyCode-Bratrix/MEG/THINGSfMRI/THINGS-fMRI/preprocessed_data", help='Path to the EEG dataset')
+    parser.add_argument('--data_path', type=str, default="Bratrix/MEG/THINGSfMRI/THINGS-fMRI/preprocessed_data", help='Path to the EEG dataset')
     parser.add_argument('--output_dir', type=str, default='./results', help='Directory to save output results')    
     parser.add_argument('--project', type=str, default="train_pos_img_text_rep", help='WandB project name')
     parser.add_argument('--entity', type=str, default="sustech_rethinkingbci", help='WandB entity name')
