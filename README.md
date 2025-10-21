@@ -50,6 +50,7 @@ Overall architecture of Bratrix.
 
 <!-- ## News -->
 <h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">✨ Update</h2>
+
 * **2025/10/07** 💻💻💻 we are ready to release EEG/MEG/fMRI model weight.
 * **2025/09/30** 💻💻💻 we release training and evaluation code.
 * **2025/09/29** 🖼️🖼️🖼️ We release all pre-processed dataset
