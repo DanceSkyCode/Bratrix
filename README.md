@@ -17,7 +17,17 @@
     <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
     <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/EEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
     <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/MEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/fMRI_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/fMRI_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a><br>
+    <a href="https://scholar.google.com/citations?user=3G2NKeIAAAAJ&hl=zh-CN" target="_blank">Zehui Feng</a>,
+    <a target="_blank">Chenqi Zhang</a>,
+    <a target="_blank">Mingru Wang</a>,
+    <a target="_blank">Minuo Wei</a>,
+    <a href="https://homepage.zjut.edu.cn/csw/" target="_blank">Shiwei Cheng</a>,
+    <a href="https://scholar.google.com/citations?user=sg4vxPoAAAAJ&hl=en" target="_blank">Cuntai Guan*</a>,
+    <a href="https://www.scopus.com/authid/detail.uri?authorId=55425962400" target="_blank">Ting Han*</a>,
+    <br>
+    Shanghai Jiao Tong University, Nanyang Technology University, Zhejiang University, Zhejiang University of Technology
+    * denotes the corresponding author
   </p>
 </p>
 
@@ -45,6 +55,13 @@ Overview of multimodal decoding paradigms.
 
 Overall architecture of Bratrix.
 
+<div align="center">
+<div>
+<img src="docs/static/images/Table-comparison.png" alt="Framework" style="max-width: 80%; height: auto;"/>
+</div>
+</div>
+
+Overall comparison performance of Bratrix.
 
 
 
