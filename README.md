@@ -12,12 +12,12 @@
   <p align="center">
     <a href='https://arxiv.org/'><img src='http://img.shields.io/badge/Paper-arxiv.2599.07721-B31B1B.svg'></a>
     <a href='https://github.com/DanceSkyCode/Bratrix'> <img src='https://img.shields.io/badge/Project-Website-orange' alt='Project Page'></a>
-    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Bratrix_THINGS_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Bratrix_THINGS_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Bratrix_THINGS_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
-    <a href='https://huggingface.co/'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/EEG_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/MEG_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/datasets/DanceSkyCode/Bratrix/tree/main/fMRI_preprocessed_data'><img src='https://img.shields.io/badge/Bratrix_THINGS_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/EEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_EEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/MEG_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_MEG-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
+    <a href='https://huggingface.co/DanceSkyCode/Bratrix/tree/main/fMRI_checkpoint'><img src='https://img.shields.io/badge/Checkpoint_fMRI-%F0%9F%A4%97%20Hugging%20Face-blue'></a>
   </p>
 </p>
 
