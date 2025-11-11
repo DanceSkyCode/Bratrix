@@ -300,7 +300,7 @@ class LinearFusion(nn.Module):
         x_fused = (x * weights).sum(dim=1)  
         return x_fused
 
-class InterMCRAlignment2(nn.Module):
+class BrainVisualAlignment2(nn.Module):
     def __init__(self, d_model=250, num_heads=8, dropout=0.1):
         super().__init__()
         self.image_proj = nn.Linear(1024, 1024)
@@ -415,7 +415,7 @@ class InterMCRAlignment2(nn.Module):
             weight_matrix_eeg = (image_proj * weight_matrix_eeg).mean(dim=2)
             image_proj = torch.cat((image_proj, weight_matrix_eeg),dim = 1)
             return image_proj, eeg_features_o
-class InterMCRAlignment(nn.Module):
+class BrainVisualAlignment(nn.Module):
     def __init__(self, d_model=250, num_heads=8, dropout=0.1):
         super().__init__()
         self.image_proj = nn.Linear(1024, 1024)
@@ -605,7 +605,7 @@ class Bratrix(nn.Module):
         
         self.feature_norm = nn.LayerNorm([num_channels, sequence_length])
         
-        self.bratrix = InterMCRAlignment(
+        self.bratrix = BrainVisualAlignment(
             d_model=d_model,
             num_heads=8,
             dropout=default_config.dropout
@@ -613,7 +613,7 @@ class Bratrix(nn.Module):
         path = r"Bratrix/best_top5.pth"
         self.bratrix = load_pretrained_bratrix(self.bratrix, path)
         self.noise_aug = NoiseAugmentation(sigma=0.01)
-        self.bratrix1 = InterMCRAlignment2(
+        self.bratrix1 = BrainVisualAlignment2(
             d_model=d_model,
             num_heads=8,
             dropout=default_config.dropout

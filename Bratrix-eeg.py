@@ -332,7 +332,7 @@ def visualize_features(text_proj, weighted_eeg_text, prior_matrix_mri, sample_id
     plt.title("prior_matrix_mri (sample {})".format(sample_idx))
     plt.show()
 
-class InterMCRAlignment(nn.Module):
+class BrainVisualAlignment(nn.Module):
     def __init__(self, d_model=256, num_heads=8, dropout=0.1):
         super().__init__()
         assert d_model % num_heads == 0, f"d_model ({d_model}) must be divisible by num_heads ({num_heads})"
@@ -549,7 +549,7 @@ class Bratrix(nn.Module):
         
         self.feature_norm = nn.LayerNorm([num_channels, sequence_length])
         
-        self.bratrix = InterMCRAlignment(
+        self.bratrix = BrainVisualAlignment(
             d_model=d_model,
             num_heads=8,
             dropout=default_config.dropout
