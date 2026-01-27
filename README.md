@@ -1,6 +1,6 @@
 <div align="center">
 
-<h2 style="border-bottom: 1px solid lightgray;">🧠✨👀Unveiling Deep Semantic Uncertainty Perception for Language-Anchored Multi-modal Vision-Brain Alignment</h2>
+<h2 style="border-bottom: 1px solid lightgray;">🧠✨👀Bridging Vision and Brain with Language-Anchored Semantic Alignment</h2>
 </div>
 
 
@@ -68,7 +68,7 @@ Overall comparison performance of Bratrix.
 <!-- ## News -->
 <h2 style="border-bottom: 1px solid lightgray; margin-bottom: 5px;">✨ Update</h2>
 
-* **2025/10/07** 💻💻💻 we are ready to release EEG/MEG/fMRI model weight.
+* **2025/10/07** 💻💻💻 we release EEG/MEG/fMRI model weight.
 * **2025/09/30** 💻💻💻 we release training and evaluation code.
 * **2025/09/29** 🖼️🖼️🖼️ We release all pre-processed dataset
 * **2025/09/28** 🖼️🖼️🖼️ we release all raw dataset.
